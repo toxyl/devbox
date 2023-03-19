@@ -1,0 +1,42 @@
+{{$.AppName}}() {
+    # the current word being completed
+    local cur=${COMP_WORDS[COMP_CWORD]}
+
+    # the application name
+    local app="${COMP_WORDS[0]}"
+
+    # the command name
+    local cmd="${COMP_WORDS[1]}"
+
+    # index into the command
+    local offset=$((COMP_CWORD-2))
+
+    # array for possible completions
+    local completions
+
+    if [[ "$app" == "{{.AppName}}" ]]; then
+        case "$cmd" in 
+        {{ range $name, $d := .CommandData }}
+            "{{ $name }}") 
+                case "$offset" in
+                {{ range $i, $c := $d }}
+                    {{ if .Variadic }}*{{ else }}"{{ $i }}"{{ end }}) {{ range .Shopt }}
+                        shopt -s {{ . }}{{ end }} {{ range .Compopt }}
+                        compopt -o {{ . }}{{ end }}
+                        completions={{ .Completions }}
+                        ;;
+                {{ end }}
+                esac
+                ;;
+        {{ end }}
+            *)
+            completions=($(compgen -W '{{range .Commands}}{{.}} {{end}}' -- $cur))
+            ;;
+        esac
+    fi
+
+    if [[ -z "${COMPREPLY[*]}" || "${COMPREPLY[@]}" != *"$cur"* ]]; then
+        COMPREPLY=(${completions[@]})
+    fi
+}
+complete -F {{$.AppName}} {{$.AppName}}

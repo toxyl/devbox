@@ -1,0 +1,37 @@
+# The "limits" section defines the resource limits for the devboxes, including CPU usage, memory usage, swap space, and maximum number of processes.
+limits:
+  cpu: 0.1 # normalized percentage of host CPU (0..1)
+  mem:
+    hard: 0.10 # normalized percentage of host memory (0..1)
+    soft: 0.75 # normalized percentage of `hard` (0..1) after which the OS might consider killing processes to reclaim memory
+    swap: 0.10 # normalized percentage of `hard` (0..1) to grant as additional swap
+  pids: 1024 # maximum number of processes allowed in the container
+
+# The "options" section defines additional configuration options, such as mapping users and groups and binding all other devboxes.
+options:
+  map_users_and_groups: true # not all distributions need this, try setting it to false if you encouter startup errors
+  bind_all: false # if enabled (true) all other devboxes will be mounted at /devboxes
+
+# The "env" section sets environment variables for the devboxes, including the shell, terminal, home directory, and path.
+env:
+  shell: /bin/bash # this is the shell that will be used by the "enter" and "shell" commands
+  term: xterm
+  term_info: /usr/share/terminfo/
+  home: "/root"
+  path: "/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/usr/share/games:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/usr/share/games:/usr/local/sbin:/usr/sbin:/sbin:/snap/bin:/snap/bin:/usr/sandbox/:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/usr/share/games:/usr/local/sbin:/usr/sbin:/sbin:/snap/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/usr/share/games:/usr/local/sbin:/usr/sbin:/sbin:/snap/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games"
+  vars:
+    MY_ENV_VAR: hello world
+    MY_OTHER_ENV_VAR: 123
+
+# The "commands" section defines scripts to execute before and after logging into the interactive shell.
+commands:
+  start: /usr/local/bin/start
+  stop: /usr/local/bin/stop
+
+# The "binds" section allows the binding of host directories to directories within the devboxes.
+# Each entry is formatted as "src":"dst" pairs where 
+# "src" is the directory within the DdevBox and 
+# "dst" is the directory on the host to bind
+binds: 
+# For exmple, to bind /var/www/html on the host to /www on the DevBox you can enable this:
+#  "/www": "/var/www/html"

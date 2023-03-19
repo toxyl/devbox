@@ -1,0 +1,4 @@
+#!/bin/bash
+echo -e ""
+echo -e "\033[1m$(hostname)\033[0m is about to leave us, goodbye!"
+echo -e ""

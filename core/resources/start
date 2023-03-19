@@ -1,0 +1,23 @@
+#!/bin/bash
+if [ -L /etc/resolv.conf ]; then
+    target=$(readlink -f /etc/resolv.conf)
+    if [ ! -e "$target" ]; then
+        # this can happen with Ubuntu rootfs images
+        # that rely on systemd which won't be booted in a container.
+        # let's just create a new file, so the container has working internet.
+        echo -n "Fixing broken /etc/resolv.conf ... "
+        rm /etc/resolv.conf
+        echo "nameserver 8.8.8.8" > /etc/resolv.conf
+        echo "done!"
+    fi
+fi
+echo -e ""
+echo -e "You are now in the \033[1m$(hostname)\033[0m container."
+echo -e "Please step carefully, thank you."
+echo -e ""
+echo -e "You can find the container settings in \033[1m/config.yaml\033[0m"
+echo -e ""
+echo -e "\033[1mWARNING!\033[0m"
+echo -e "This is only for local development and"
+echo -e "NOT suited nor meant for production use."
+echo -e ""
