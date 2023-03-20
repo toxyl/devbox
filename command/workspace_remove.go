@@ -20,13 +20,14 @@ func WorkspaceRemove(arg ...string) error {
 		return fmt.Errorf("workspace does not exist")
 	}
 
-	devbooxes := arg[1:]
+	devboxes := arg[1:]
 	w, err := config.OpenWorkspace(file)
 	if err != nil {
 		return err
 	}
-	for _, d := range devbooxes {
+	for _, d := range devboxes {
 		_ = os.RemoveAll(filepath.Join(path, d+".tar.gz"))
+		w.Remove(d)
 	}
 	err = w.Save(file)
 	if err != nil {

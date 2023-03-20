@@ -3,6 +3,7 @@ package cgroups
 import (
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/containerd/cgroups/v3/cgroup2"
 )
@@ -88,6 +89,8 @@ func (cg *cgroup) setCPUMax(quota int64, period uint64) {
 // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 func CreateCGroup(appName, name string, cpuQuota, memHardMax, memSoftMax, memSwap int64, pidsMax int64) (path string, err error) {
+	re := regexp.MustCompile("[^a-zA-Z0-9]+")
+	name = re.ReplaceAllString(name, "")
 	cg := &cgroup{
 		name: appName + name,
 		resources: &cgroup2.Resources{
@@ -115,6 +118,8 @@ func CreateCGroup(appName, name string, cpuQuota, memHardMax, memSoftMax, memSwa
 }
 
 func DestroyCGroup(appName, name string) error {
+	re := regexp.MustCompile("[^a-zA-Z0-9]+")
+	name = re.ReplaceAllString(name, "")
 	cg := &cgroup{
 		name: appName + name,
 	}
