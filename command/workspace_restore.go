@@ -1,6 +1,7 @@
 package command
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/toxyl/devbox/config"
@@ -14,6 +15,10 @@ func WorkspaceRestore(arg ...string) error {
 	if err != nil {
 		return err
 	}
+	if !fileExists(tarFile) {
+		return fmt.Errorf("the source file %s does not exist", tarFile)
+	}
+
 	dstDir := arg[0]
 	dstDir, err = filepath.Abs(dstDir)
 	if err != nil {

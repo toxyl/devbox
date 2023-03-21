@@ -1,6 +1,7 @@
 package command
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/toxyl/devbox/config"
@@ -14,12 +15,16 @@ func WorkspaceStore(arg ...string) error {
 	if err != nil {
 		return err
 	}
-	pathDst := arg[1]
-	pathDst, err = filepath.Abs(pathDst)
+	if !fileExists(path) {
+		return fmt.Errorf("the source directory %s does not exist", path)
+	}
+
+	tarfile := arg[1]
+	tarfile, err = filepath.Abs(tarfile)
 	if err != nil {
 		return err
 	}
-	log.Success("Storing workspace to %s", glog.File(pathDst))
+	log.Success("Storing workspace to %s", glog.File(tarfile))
 	file := filepath.Join(path, ".workspace.yaml")
 	w, err := config.OpenWorkspace(file)
 	if err != nil {
@@ -32,7 +37,7 @@ func WorkspaceStore(arg ...string) error {
 			return err
 		}
 	}
-	tar.FromDir(path, pathDst)
-	log.Success("Stored workspace to %s", glog.File(pathDst))
+	tar.FromDir(path, tarfile)
+	log.Success("Stored workspace to %s", glog.File(tarfile))
 	return nil
 }
