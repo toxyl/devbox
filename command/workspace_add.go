@@ -41,7 +41,7 @@ func WorkspaceAdd(arg ...string) error {
 		if err != nil {
 			return err
 		}
-		configs = append(configs, *dboxConfig)
+		configs = append(configs, dboxConfig)
 		delays = append(delays, delay)
 		names = append(names, dboxName)
 	}

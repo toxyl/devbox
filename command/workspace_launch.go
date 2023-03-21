@@ -50,5 +50,20 @@ func WorkspaceLaunch(arg ...string) error {
 		}
 	}()
 
-	return tmux.SpawnWorkspace(true, commands...)
+	err = tmux.SpawnWorkspace(true, commands...)
+	// store current container config back into workspace config
+	for i, devbox := range w.Devboxes {
+		dboxPath := getDevboxConfigPath(devbox.Name)
+		if !fileExists(dboxPath) {
+			forceExit(fmt.Sprintf("Devbox %s does not exist!", glog.Auto(dboxPath)), core.EXIT_DEVBOX_NOT_FOUND)
+		}
+		if err := devbox.Config.Load(dboxPath); err != nil {
+			return err
+		}
+		w.Devboxes[i] = devbox
+	}
+
+	w.Save(file)
+
+	return err
 }

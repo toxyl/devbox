@@ -36,23 +36,24 @@ func parseWithViper(file string, config interface{}) error {
 	if len(cType) > 0 {
 		cType = cType[1:]
 	}
-	viper.SetConfigName(file)
-	viper.SetConfigType(cType)
-	viper.AddConfigPath(cPath)
-	err = viper.ReadInConfig()
+	v := viper.New()
+	v.SetConfigName(file)
+	v.SetConfigType(cType)
+	v.AddConfigPath(cPath)
+	err = v.ReadInConfig()
 	if err != nil {
 		return err
 	}
-	if err := viper.Unmarshal(config); err != nil {
+	if err := v.Unmarshal(config); err != nil {
 		return err
 	}
 	return nil
 }
 
-func DevboxFromFile(file string) (*Config, error) {
+func DevboxFromFile(file string) (Config, error) {
 	c := NewConfig()
 	err := parseWithViper(file, c)
-	return c, err
+	return *c, err
 }
 
 func DevboxToFile(c *Config, file string) error {

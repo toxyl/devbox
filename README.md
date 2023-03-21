@@ -109,7 +109,7 @@ binds:
 ```
 
 ## Workspaces
-Each workspace has a configuration file at `/.workspace.yaml`which contains the configuration of all DevBoxes of the workspace. When launching a workspace the DevBox configuration from the workspace is written to `/config.yaml` of the DevBox, i.e. workspace settings always take precedence and replace DevBox settings.
+Each workspace has a configuration file at `/.workspace.yaml`which contains the configuration of all DevBoxes of the workspace. When launching a workspace the DevBox configuration from the workspace is written to `/config.yaml` of the DevBox, i.e. workspace settings always take precedence and replace DevBox settings. The workspace config will be updated with the configs of the DevBoxes once the last DevBox of the workspace is closed.
 
 # Usage Examples
 ## DevBoxes

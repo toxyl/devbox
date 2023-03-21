@@ -32,6 +32,19 @@ func (c *Config) Save(file string) error {
 	return nil
 }
 
+func (c *Config) Load(file string) error {
+	conf, err := DevboxFromFile(file)
+	if err != nil {
+		return err
+	}
+	c.Commands = conf.Commands
+	c.Limits = conf.Limits
+	c.Options = conf.Options
+	c.Binds = conf.Binds
+	c.Env = conf.Env
+	return nil
+}
+
 func NewConfig() *Config {
 	c := &Config{
 		Commands: Commands{

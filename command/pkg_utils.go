@@ -23,7 +23,7 @@ func loadDevbox(name string) string {
 	createMissingDevboxFiles(name)
 	c, err := config.DevboxFromFile(getDevboxConfigPath(name))
 	must(err)
-	core.Config = c
+	core.Config = &c
 	return getDevboxPath(name)
 }
 
