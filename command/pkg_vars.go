@@ -8,6 +8,8 @@ import (
 var (
 	createMissingDevboxFiles = core.CreateMissingDevboxFiles
 	fileExists               = core.FileExists
+	getWorkspacePath         = core.GetWorkspacePath
+	getWorkspaceConfigPath   = core.GetWorkspaceConfigPath
 	getDevboxPath            = core.GetDevboxPath
 	getDevboxConfigPath      = core.GetDevboxConfigPath
 	findCommand              = core.FindCommand

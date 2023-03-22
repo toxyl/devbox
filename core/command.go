@@ -84,15 +84,6 @@ func (ac *command) Run() error {
 	return ac.run(args...)
 }
 
-const (
-	ARG_TYPE_DIR = iota
-	ARG_TYPE_FILE
-	ARG_TYPE_TARBALL
-	ARG_TYPE_IP
-	ARG_TYPE_COMMAND
-	ARG_TYPE_DEVBOX_LIST
-)
-
 type ArgInfo struct {
 	Optional       bool
 	Variadic       bool
@@ -129,6 +120,14 @@ func (ai *ArgInfo) Completion() bashcompletion.Completion {
 		return bashcompletion.Completion{
 			Variadic:    ai.Variadic,
 			Completions: "($(compgen -W '$(for dir in " + GetDevboxDir() + "/*/; do basename \"$dir\"; done)' -- $cur))",
+			Compopt:     []string{},
+			Shopt:       []string{},
+		}
+
+	case ARG_TYPE_WORKSPACE_LIST:
+		return bashcompletion.Completion{
+			Variadic:    ai.Variadic,
+			Completions: "($(compgen -W '$(for dir in " + GetWorkspaceDir() + "/*/; do basename \"$dir\"; done)' -- $cur))",
 			Compopt:     []string{},
 			Shopt:       []string{},
 		}

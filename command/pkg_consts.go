@@ -15,6 +15,8 @@ const (
 	WORKSPACE_STORE     = "workspace-store"
 	WORKSPACE_RESTORE   = "workspace-restore"
 	WORKSPACE_DESTROY   = "workspace-destroy"
+	STORAGE_PATH_GET    = "storage-path-get"
+	STORAGE_PATH_SET    = "storage-path-set"
 	SELF                = "/proc/self/exe"
 )
 

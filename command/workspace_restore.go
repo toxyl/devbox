@@ -19,7 +19,8 @@ func WorkspaceRestore(arg ...string) error {
 		return fmt.Errorf("the source file %s does not exist", tarFile)
 	}
 
-	dstDir := arg[0]
+	name := arg[0]
+	dstDir := getWorkspacePath(name)
 	dstDir, err = filepath.Abs(dstDir)
 	if err != nil {
 		return err
@@ -31,7 +32,7 @@ func WorkspaceRestore(arg ...string) error {
 		return err
 	}
 
-	file := filepath.Join(dstDir, ".workspace.yaml")
+	file := getWorkspaceConfigPath(name)
 	w, err := config.OpenWorkspace(file)
 	if err != nil {
 		return err

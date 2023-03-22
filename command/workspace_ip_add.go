@@ -2,20 +2,15 @@ package command
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/toxyl/devbox/config"
 	"github.com/toxyl/glog"
 )
 
 func WorkspaceIPAdd(arg ...string) error {
-	path := arg[0]
-	path, err := filepath.Abs(path)
-	if err != nil {
-		return err
-	}
+	name := arg[0]
+	file := getWorkspaceConfigPath(name)
 
-	file := filepath.Join(path, ".workspace.yaml")
 	if !fileExists(file) {
 		return fmt.Errorf("workspace does not exist")
 	}

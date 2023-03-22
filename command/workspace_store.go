@@ -10,7 +10,8 @@ import (
 )
 
 func WorkspaceStore(arg ...string) error {
-	path := arg[0]
+	name := arg[0]
+	path := getWorkspacePath(name)
 	path, err := filepath.Abs(path)
 	if err != nil {
 		return err
@@ -25,7 +26,7 @@ func WorkspaceStore(arg ...string) error {
 		return err
 	}
 	log.Success("Storing workspace to %s", glog.File(tarfile))
-	file := filepath.Join(path, ".workspace.yaml")
+	file := getWorkspaceConfigPath(name)
 	w, err := config.OpenWorkspace(file)
 	if err != nil {
 		return err

@@ -24,3 +24,13 @@ const (
 	STOP_SCRIPT_FILE     = "usr/local/bin/stop"
 	APP_NAME             = "devbox"
 )
+
+const (
+	ARG_TYPE_DIR = iota
+	ARG_TYPE_FILE
+	ARG_TYPE_TARBALL
+	ARG_TYPE_IP
+	ARG_TYPE_COMMAND
+	ARG_TYPE_DEVBOX_LIST
+	ARG_TYPE_WORKSPACE_LIST
+)

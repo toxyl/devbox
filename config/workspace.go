@@ -1,7 +1,6 @@
 package config
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -73,7 +72,7 @@ func (w *Workspace) Save(file string) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(file, yamlConfig, 0644)
+	err = os.WriteFile(file, yamlConfig, 0644)
 	if err != nil {
 		return err
 	}
