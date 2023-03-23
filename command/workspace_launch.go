@@ -46,7 +46,7 @@ func WorkspaceLaunch(arg ...string) error {
 		}
 	}()
 
-	err = tmux.SpawnWorkspace(true, commands...)
+	err = tmux.SpawnWorkspace(name, true, commands...)
 	// store current container config back into workspace config
 	for i, devbox := range w.Devboxes {
 		dboxPath := getDevboxConfigPath(devbox.Name)

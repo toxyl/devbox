@@ -35,6 +35,6 @@ func WorkspaceRemove(arg ...string) error {
 	if err != nil {
 		return err
 	}
-	log.Success("Devboxes removed from %s", glog.File(file))
+	log.Success("DevBoxes removed from %s", glog.File(file))
 	return nil
 }

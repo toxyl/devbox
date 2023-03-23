@@ -247,6 +247,19 @@ func main() {
 	)
 
 	core.RegisterCommand(
+		command.WORKSPACE_DETACH,
+		"Detaches all clients connected to the workspace `name`.",
+		core.ArgInfoList{
+			{
+				Type:    core.ARG_TYPE_WORKSPACE_LIST,
+				Name:    "name",
+				Example: "my-workspace",
+			},
+		},
+		command.WorkspaceDetach,
+	)
+
+	core.RegisterCommand(
 		command.WORKSPACE_DESTROY,
 		"Completely removes the workspace `name`.",
 		core.ArgInfoList{

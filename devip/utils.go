@@ -5,15 +5,15 @@ import (
 	"bytes"
 	"fmt"
 	"net"
-	"os/exec"
 	"regexp"
 	"sort"
-	"strings"
+
+	"github.com/toxyl/devbox/sudo"
 )
 
 func getList() map[string]string {
 	res := map[string]string{}
-	output, err := sudoExec("ip", "address", "show", "dev", "lo")
+	output, err := sudo.Exec("ip", "address", "show", "dev", "lo")
 	if err != nil {
 		return res
 	}
@@ -35,29 +35,6 @@ func getList() map[string]string {
 		res[ip.String()] = fmt.Sprintf("%s/%s", ip.String(), cidrs[i])
 	}
 	return res
-}
-
-// sudoExec runs the given command with sudo privileges and returns its output.
-func sudoExec(name string, arg ...string) ([]byte, error) {
-	args := []string{"-S", "-p", "", "sh", "-c", fmt.Sprintf("%s %s", name, quoteArgs(arg))}
-	cmd := exec.Command("sudo", args...)
-	cmd.Stdin = strings.NewReader("")
-
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return output, err
-	}
-	return output, nil
-}
-
-// quoteArgs quotes the given arguments so they can be passed as a single argument to a shell command.
-func quoteArgs(args []string) string {
-	for i, arg := range args {
-		if strings.Contains(arg, " ") {
-			args[i] = fmt.Sprintf("'%s'", arg)
-		}
-	}
-	return strings.Join(args, " ")
 }
 
 // isLocalhost checks whether the given alias is a loopback address.

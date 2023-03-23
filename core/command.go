@@ -131,6 +131,14 @@ func (ai *ArgInfo) Completion() bashcompletion.Completion {
 			Compopt:     []string{},
 			Shopt:       []string{},
 		}
+
+	case ARG_TYPE_SESSION_LIST:
+		return bashcompletion.Completion{
+			Variadic:    ai.Variadic,
+			Completions: "($(compgen -W \"$(tmux list-sessions | grep '^devbox-' | awk '{print $1}' | sed 's/.$//' | tr '\\n' ' ')\" -- $cur))",
+			Compopt:     []string{},
+			Shopt:       []string{},
+		}
 	}
 	return bashcompletion.Completion{
 		Variadic:    ai.Variadic,
