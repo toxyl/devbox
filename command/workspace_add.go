@@ -53,10 +53,6 @@ func WorkspaceAdd(arg ...string) error {
 	for i, c := range configs {
 		name := names[i]
 		image := filepath.Join(path, name+".tar.gz")
-		err = Store(name, image)
-		if err != nil {
-			return err
-		}
 		delay := delays[i]
 		w.Add(name, image, int64(delay), c)
 	}

@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/toxyl/devbox/config"
@@ -38,7 +39,20 @@ func WorkspaceStore(arg ...string) error {
 			return err
 		}
 	}
-	tar.FromDir(path, tarfile)
+	err = tar.FromDir(path, tarfile)
+	if err != nil {
+		log.Error("Could not store workspace to %s: %s", glog.File(tarfile), glog.Error(err))
+		return nil
+	}
+
+	// remove the image files to save diskspace
+	for _, c := range w.Devboxes {
+		err = os.Remove(c.Image)
+		if err != nil {
+			return err
+		}
+	}
+
 	log.Success("Stored workspace to %s", glog.File(tarfile))
 	return nil
 }
