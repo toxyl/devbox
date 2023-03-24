@@ -13,12 +13,7 @@ import (
 )
 
 func WorkspaceAdd(arg ...string) error {
-	path := arg[0]
-	path, err := filepath.Abs(path)
-	if err != nil {
-		return err
-	}
-	file := filepath.Join(path, ".workspace.yaml")
+	name := arg[0]
 	devboxes := arg[1:]
 	configs := []config.Config{}
 	delays := []int{}
@@ -45,7 +40,13 @@ func WorkspaceAdd(arg ...string) error {
 		delays = append(delays, delay)
 		names = append(names, dboxName)
 	}
+	file := getWorkspaceConfigPath(name)
 	w, err := config.OpenWorkspace(file)
+	if err != nil {
+		return err
+	}
+	path := getWorkspacePath(name)
+	path, err = filepath.Abs(path)
 	if err != nil {
 		return err
 	}

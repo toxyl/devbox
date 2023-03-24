@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 	"strings"
+
+	"github.com/toxyl/devbox/sudo"
 )
 
 // remove removes the loopback alias of the given IP.
@@ -19,7 +21,7 @@ func remove(ip string) error {
 		ip += "/32"
 	}
 
-	output, err := sudoExec("ip", "address", "del", ip, "dev", "lo")
+	output, err := sudo.Exec("ip", "address", "del", ip, "dev", "lo")
 	if err != nil {
 		if !strings.Contains(string(output), "Cannot assign requested address") {
 			return fmt.Errorf(string(output) + ": " + err.Error())

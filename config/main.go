@@ -59,3 +59,9 @@ func DevboxFromFile(file string) (Config, error) {
 func DevboxToFile(c *Config, file string) error {
 	return c.Save(file)
 }
+
+func GlobalFromFile(file string) (AppConfig, error) {
+	c := AppConfig{}
+	err := parseWithViper(file, &c)
+	return c, err
+}

@@ -1,66 +1,60 @@
 package tmux
 
-import (
-	"os"
-	"os/exec"
-)
-
 type TmuxWorkspace struct {
 	created bool
+	name    string
 }
 
-func (tw *TmuxWorkspace) exec(args ...string) error {
-	cmd := exec.Command("tmux", args...)
-	cmd.Stdin = os.Stdin
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	defer func() {
-		if cmd.Process != nil {
-			cmd.Process.Release()
-		}
-	}()
-	return cmd.Run()
-}
-
-func (tw *TmuxWorkspace) Add(cmd string) error {
+func (tw *TmuxWorkspace) add(cmd string) error {
 	if !tw.created {
-		if err := tw.exec("new-session", "-d", cmd); err != nil {
+		if err := Exec("new-session", "-s", tw.name, "-d", cmd); err != nil {
 			return err
 		}
 		tw.created = true
 		return nil
 	}
-	return tw.exec("split-window", "-v", cmd)
+	return Exec("split-window", "-v", cmd)
 }
 
-func (tw *TmuxWorkspace) Spawn(attach bool) error {
-	if err := tw.exec("select-layout", "tiled"); err != nil {
+func (tw *TmuxWorkspace) spawn(attach bool) error {
+	if err := Exec("select-layout", "tiled"); err != nil {
 		return err
 	}
-	if err := tw.exec("set-option", "-g", "mouse", "on"); err != nil {
+	if err := Exec("set-option", "-g", "mouse", "on"); err != nil {
 		return err
 	}
 	if attach {
-		if err := tw.exec("attach-session"); err != nil {
+		if err := Exec("attach-session"); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func NewTmuxWorkspace() *TmuxWorkspace {
+func newTmuxWorkspace(name string) *TmuxWorkspace {
 	tw := &TmuxWorkspace{
+		name:    "devbox-" + name,
 		created: false,
 	}
 	return tw
 }
 
-func SpawnWorkspace(attach bool, commands ...string) error {
-	tw := NewTmuxWorkspace()
+func SpawnWorkspace(name string, attach bool, commands ...string) error {
+	if HasSession(name) {
+		// we already have a session
+		if !attach {
+			// but we don't want to attach, let's quietly ignore this
+			return nil
+		}
+		// let's attach
+		return Exec("attach-session", "-t", "devbox-"+name)
+	}
+
+	tw := newTmuxWorkspace(name)
 	for _, cmd := range commands {
-		if err := tw.Add(cmd); err != nil {
+		if err := tw.add(cmd); err != nil {
 			return err
 		}
 	}
-	return tw.Spawn(attach)
+	return tw.spawn(attach)
 }

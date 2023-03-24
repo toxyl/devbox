@@ -2,6 +2,7 @@ package core
 
 import (
 	_ "embed"
+	"os"
 	"regexp"
 
 	"github.com/toxyl/devbox/config"
@@ -31,5 +32,6 @@ var (
 		ERR_FILE_NOT_FOUND: EXIT_FILE_NOT_FOUND,
 		ERR_FATAL:          EXIT_UNKNOWN_FATAL,
 	}
-	errReg = glog.NewGErrorRegistry()
+	errReg      = glog.NewGErrorRegistry()
+	storagePath = os.TempDir()
 )

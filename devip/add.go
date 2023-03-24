@@ -4,6 +4,8 @@ package devip
 import (
 	"net"
 	"strings"
+
+	"github.com/toxyl/devbox/sudo"
 )
 
 // add adds a loopback alias for the given IP.
@@ -13,7 +15,7 @@ func add(ip string) error {
 		// we assume it didn't contain a CIDR, so it's a single machine
 		ip += "/32"
 	}
-	output, err := sudoExec("ip", "address", "add", ip, "dev", "lo")
+	output, err := sudo.Exec("ip", "address", "add", ip, "dev", "lo")
 	if err != nil && !strings.Contains(string(output), "File exists") {
 		return err
 	}

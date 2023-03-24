@@ -10,18 +10,20 @@ import (
 )
 
 func WorkspaceRemove(arg ...string) error {
-	path := arg[0]
-	path, err := filepath.Abs(path)
-	if err != nil {
-		return err
-	}
-	file := filepath.Join(path, ".workspace.yaml")
+	name := arg[0]
+	file := getWorkspaceConfigPath(name)
+
 	if !fileExists(file) {
 		return fmt.Errorf("workspace does not exist")
 	}
 
 	devboxes := arg[1:]
 	w, err := config.OpenWorkspace(file)
+	if err != nil {
+		return err
+	}
+	path := getWorkspacePath(name)
+	path, err = filepath.Abs(path)
 	if err != nil {
 		return err
 	}
@@ -33,6 +35,6 @@ func WorkspaceRemove(arg ...string) error {
 	if err != nil {
 		return err
 	}
-	log.Success("Devboxes removed from %s", glog.File(file))
+	log.Success("DevBoxes removed from %s", glog.File(file))
 	return nil
 }

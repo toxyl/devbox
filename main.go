@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/toxyl/devbox/command"
+	"github.com/toxyl/devbox/config"
 	"github.com/toxyl/devbox/core"
 	"github.com/toxyl/glog"
 )
@@ -22,9 +23,23 @@ func main() {
 
 	core.InitErrorRegistry()
 
+	// check if AppConfig exists, else create default one
+	ac := config.NewAppConfig()
+	if !core.FileExists(ac.Path()) {
+		if err := ac.Save(); err != nil {
+			core.ForceFatal("could not create default app config")
+		}
+	}
+	err := ac.Load()
+	if err != nil {
+		core.ForceFatal("could not load app config")
+	}
+
+	core.SetStorageDir(ac.StoragePath)
+
 	core.RegisterCommand(
 		command.MAKE,
-		"Creates a new `devbox` from a `tarball` (either filepath or URL).\nIf `tarball` is a local file it will be unpacked to the devbox location.\nIf `tarball`` is a URL the file will be downloaded first and then unpacked.",
+		"Creates a new `devbox` from a `tarball` (either filepath or URL).\nIf `tarball` is a local file it will be unpacked to the devbox location.\nIf `tarball` is a URL the file will be downloaded first and then unpacked.",
 		core.ArgInfoList{
 			{
 				Type:    core.ARG_TYPE_DEVBOX_LIST,
@@ -104,12 +119,12 @@ func main() {
 
 	core.RegisterCommand(
 		command.WORKSPACE_ADD,
-		"Adds `devbox`es to the workspace in `path`.\nIf the workspace doesn't exist a new one will be created.\nEach argument can have an optional `:delay` parameter which is used to set the startup delay for the `devbox` in seconds.",
+		"Adds `devbox`es to the workspace `name`.\nIf the workspace doesn't exist a new one will be created.\nEach argument can have an optional `:delay` parameter which is used to set the startup delay for the `devbox` in seconds.",
 		core.ArgInfoList{
 			{
-				Type:    core.ARG_TYPE_DIR,
-				Name:    "path",
-				Example: "/tmp/my-workspace/",
+				Type:    core.ARG_TYPE_WORKSPACE_LIST,
+				Name:    "name",
+				Example: "my-workspace",
 			},
 			{
 				Variadic:       true,
@@ -124,12 +139,12 @@ func main() {
 
 	core.RegisterCommand(
 		command.WORKSPACE_REMOVE,
-		"Removes `devbox`es from the workspace in `path`.",
+		"Removes `devbox`es from the workspace `name`.",
 		core.ArgInfoList{
 			{
-				Type:    core.ARG_TYPE_DIR,
-				Name:    "path",
-				Example: "/tmp/my-workspace/",
+				Type:    core.ARG_TYPE_WORKSPACE_LIST,
+				Name:    "name",
+				Example: "my-workspace",
 			},
 			{
 				Variadic:       true,
@@ -144,12 +159,12 @@ func main() {
 
 	core.RegisterCommand(
 		command.WORKSPACE_IP_ADD,
-		"Adds `IP`s to the workspace in `path`.",
+		"Adds `IP`s to the workspace `name`.",
 		core.ArgInfoList{
 			{
-				Type:    core.ARG_TYPE_DIR,
-				Name:    "path",
-				Example: "/tmp/my-workspace/",
+				Type:    core.ARG_TYPE_WORKSPACE_LIST,
+				Name:    "name",
+				Example: "my-workspace",
 			},
 			{
 				Variadic:       true,
@@ -164,12 +179,12 @@ func main() {
 
 	core.RegisterCommand(
 		command.WORKSPACE_IP_REMOVE,
-		"Removes `IP`s from the workspace in `path`.",
+		"Removes `IP`s from the workspace `name`.",
 		core.ArgInfoList{
 			{
-				Type:    core.ARG_TYPE_DIR,
-				Name:    "path",
-				Example: "/tmp/my-workspace/",
+				Type:    core.ARG_TYPE_WORKSPACE_LIST,
+				Name:    "name",
+				Example: "my-workspace",
 			},
 			{
 				Variadic:       true,
@@ -184,12 +199,12 @@ func main() {
 
 	core.RegisterCommand(
 		command.WORKSPACE_LAUNCH,
-		"Launches the workspace in `path` in a tmux session.",
+		"Launches the workspace `name` in a tmux session.",
 		core.ArgInfoList{
 			{
-				Type:    core.ARG_TYPE_DIR,
-				Name:    "path",
-				Example: "/tmp/my-workspace/",
+				Type:    core.ARG_TYPE_WORKSPACE_LIST,
+				Name:    "name",
+				Example: "my-workspace",
 			},
 		},
 		command.WorkspaceLaunch,
@@ -197,12 +212,12 @@ func main() {
 
 	core.RegisterCommand(
 		command.WORKSPACE_STORE,
-		"Stores the workspace in `path` as tarball.\nSupported extensions: .tar.gz, .tar.xz",
+		"Stores the workspace `name` as tarball.\nSupported extensions: .tar.gz, .tar.xz",
 		core.ArgInfoList{
 			{
-				Type:    core.ARG_TYPE_DIR,
-				Name:    "path",
-				Example: "/tmp/my-workspace/",
+				Type:    core.ARG_TYPE_WORKSPACE_LIST,
+				Name:    "name",
+				Example: "my-workspace",
 			},
 			{
 				Type:    core.ARG_TYPE_TARBALL,
@@ -215,12 +230,12 @@ func main() {
 
 	core.RegisterCommand(
 		command.WORKSPACE_RESTORE,
-		"Restores the workspace from `tarball` to `path`.\n"+glog.Bold()+glog.WrapOrange("Warning:")+glog.Reset()+" Existing devboxes will be overwritten!",
+		"Restores the workspace `name` from `tarball`.\n"+glog.Bold()+glog.WrapOrange("Warning:")+glog.Reset()+" Existing devboxes will be overwritten!",
 		core.ArgInfoList{
 			{
-				Type:    core.ARG_TYPE_DIR,
-				Name:    "path",
-				Example: "/tmp/my-workspace/",
+				Type:    core.ARG_TYPE_WORKSPACE_LIST,
+				Name:    "name",
+				Example: "my-workspace",
 			},
 			{
 				Type:    core.ARG_TYPE_TARBALL,
@@ -232,8 +247,41 @@ func main() {
 	)
 
 	core.RegisterCommand(
+		command.WORKSPACE_DETACH,
+		"Detaches all clients connected to the workspace `name`.",
+		core.ArgInfoList{
+			{
+				Type:    core.ARG_TYPE_WORKSPACE_LIST,
+				Name:    "name",
+				Example: "my-workspace",
+			},
+		},
+		command.WorkspaceDetach,
+	)
+
+	core.RegisterCommand(
 		command.WORKSPACE_DESTROY,
-		"Completely removes the workspace in `path`.",
+		"Completely removes the workspace `name`.",
+		core.ArgInfoList{
+			{
+				Type:    core.ARG_TYPE_WORKSPACE_LIST,
+				Name:    "name",
+				Example: "my-workspace",
+			},
+		},
+		command.WorkspaceDestroy,
+	)
+
+	core.RegisterCommand(
+		command.STORAGE_PATH_GET,
+		"Displays the currently used storage path for DevBoxes and workspaces.",
+		core.ArgInfoList{},
+		command.StoragePathGet,
+	)
+
+	core.RegisterCommand(
+		command.STORAGE_PATH_SET,
+		"Sets the storage path for DevBoxes and workspaces.\nDon't forget to run `exec bash` to refresh the Bash completions.",
 		core.ArgInfoList{
 			{
 				Type:    core.ARG_TYPE_DIR,
@@ -241,7 +289,7 @@ func main() {
 				Example: "/tmp/my-workspace/",
 			},
 		},
-		command.WorkspaceDestroy,
+		command.StoragePathSet,
 	)
 
 	// Hidden Commands

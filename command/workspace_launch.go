@@ -2,7 +2,6 @@ package command
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/toxyl/devbox/config"
 	"github.com/toxyl/devbox/core"
@@ -12,12 +11,9 @@ import (
 )
 
 func WorkspaceLaunch(arg ...string) error {
-	path := arg[0]
-	path, err := filepath.Abs(path)
-	if err != nil {
-		return err
-	}
-	file := filepath.Join(path, ".workspace.yaml")
+	name := arg[0]
+	file := getWorkspaceConfigPath(name)
+
 	if !fileExists(file) {
 		return fmt.Errorf("workspace does not exist")
 	}
@@ -50,7 +46,7 @@ func WorkspaceLaunch(arg ...string) error {
 		}
 	}()
 
-	err = tmux.SpawnWorkspace(true, commands...)
+	err = tmux.SpawnWorkspace(name, true, commands...)
 	// store current container config back into workspace config
 	for i, devbox := range w.Devboxes {
 		dboxPath := getDevboxConfigPath(devbox.Name)

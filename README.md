@@ -39,29 +39,29 @@ sudo devbox destroy             [devbox]
 
 ## Workspaces
 ```bash
-# Adds `devbox`es to the workspace in `path`.
-sudo devbox workspace-add       [path] [devbox_1<:delay>] <devbox_2> .. <devbox_n{:delay}> 
+# Adds `devbox`es to the workspace `name`.
+sudo devbox workspace-add       [name] [devbox_1<:delay>] <devbox_2> .. <devbox_n{:delay}> 
 
-# Removes `devbox`es from the workspace in `path`.
-sudo devbox workspace-remove    [path] [devbox_1] <devbox_2> .. <devbox_n>
+# Removes `devbox`es from the workspace `name`.
+sudo devbox workspace-remove    [name] [devbox_1] <devbox_2> .. <devbox_n>
 
-# Adds `IP`s to the workspace in `path`.
-sudo devbox workspace-ip-add    [path] [IP_1</prefix>] <IP_2> .. <IP_n{/prefix}>
+# Adds `IP`s to the workspace `name`.
+sudo devbox workspace-ip-add    [name] [IP_1</prefix>] <IP_2> .. <IP_n{/prefix}>
 
-# Removes `IP`s from the workspace in `path`.
-sudo devbox workspace-ip-remove [path] [IP_1</prefix>] <IP_2> .. <IP_n{/prefix}>
+# Removes `IP`s from the workspace `name`.
+sudo devbox workspace-ip-remove [name] [IP_1</prefix>] <IP_2> .. <IP_n{/prefix}>
 
-# Launches the workspace in `path` in a tmux session.
-sudo devbox workspace-launch    [path]
+# Launches the workspace `name` in a tmux session.
+sudo devbox workspace-launch    [name]
 
-# Stores the workspace in `path` as tarball.
-sudo devbox workspace-store     [path] [tarball]
+# Stores the workspace `name` as tarball.
+sudo devbox workspace-store     [name] [tarball]
 
-# Restores the workspace from `tarball` to `path`.
-sudo devbox workspace-restore   [path] [tarball]
+# Restores the workspace `name` from `tarball`.
+sudo devbox workspace-restore   [name] [tarball]
 
-# Completely removes the workspace in `path`.
-sudo devbox workspace-destroy   [path]
+# Completely removes the workspace `name`.
+sudo devbox workspace-destroy   [name]
 ```
 
 # Config
@@ -111,6 +111,91 @@ binds:
 ## Workspaces
 Each workspace has a configuration file at `/.workspace.yaml`which contains the configuration of all DevBoxes of the workspace. When launching a workspace the DevBox configuration from the workspace is written to `/config.yaml` of the DevBox, i.e. workspace settings always take precedence and replace DevBox settings. The workspace config will be updated with the configs of the DevBoxes once the last DevBox of the workspace is closed.
 
+### Attaching And Detaching
+After launching a workspace you'll be placed in a tmux session with all devboxes of the workspace. If you try to launch the same workspace again DevBox will just attach you to the existing session. If you want to detach all clients without closing the tmux session (e.g. to keep DevBox running in the background), you can use the `workspace-detach` command. 
+
+## Storage
+By default DevBox creates workspaces and DevBoxes in the temp directory (usually `/tmp`), so they will be cleaned up automatically on reboot. If you want to store workspaces and DevBoxes in a different location you can set that using the `storage-path-set` command. After switching the storage path you should run `exec bash` to update your Bash completions.  
+
+Using this you can manage multiple sets of workspaces, for example:
+```bash
+# Switch storage path to /tmp/setA
+sudo devbox storage-path-set /tmp/setA
+
+# Create three new DevBoxes (will be stored in /tmp/setA/devbox/)
+sudo devbox make bioA https://cloud-images.ubuntu.com/minimal/releases/bionic/release/ubuntu-18.04-minimal-cloudimg-amd64-root.tar.xz
+sudo devbox make bioB https://cloud-images.ubuntu.com/minimal/releases/bionic/release/ubuntu-18.04-minimal-cloudimg-amd64-root.tar.xz
+sudo devbox make bioC https://cloud-images.ubuntu.com/minimal/releases/bionic/release/ubuntu-18.04-minimal-cloudimg-amd64-root.tar.xz
+
+# Create two new workspaces (will be stored in /tmp/setA/workspace)
+sudo devbox workspace-add wsA bioA bioB
+sudo devbox workspace-add wsB bioB bioC
+
+tree -L 3 /tmp/setA/
+# /tmp/setA
+# ├── devbox
+# │   ├── bioA
+# │   │   ├── config.yaml
+# │   │   ├── ...
+# │   │   └── var
+# │   ├── bioB
+# │   │   ├── config.yaml
+# │   │   ├── ...
+# │   │   └── var
+# │   ├── bioC
+# │   │   ├── config.yaml
+# │   │   ├── ...
+# │   │   └── var
+# │   └── ubuntu-18.04-minimal-cloudimg-amd64-root.tar.xz
+# └── workspace
+#     ├── wsA
+#     │   ├── config.yaml
+#     │   ├── bioA.tar.gz
+#     │   └── bioB.tar.gz
+#     └── wsA
+#         ├── config.yaml
+#         ├── bioB.tar.gz
+#         └── bioC.tar.gz
+
+# Switch storage path to /tmp/setB
+sudo devbox storage-path-set /tmp/setB
+
+# Create three new DevBoxes (will be stored in /tmp/setB/devbox/)
+sudo devbox make bioD https://cloud-images.ubuntu.com/minimal/releases/bionic/release/ubuntu-18.04-minimal-cloudimg-amd64-root.tar.xz
+sudo devbox make bioE https://cloud-images.ubuntu.com/minimal/releases/bionic/release/ubuntu-18.04-minimal-cloudimg-amd64-root.tar.xz
+sudo devbox make bioF https://cloud-images.ubuntu.com/minimal/releases/bionic/release/ubuntu-18.04-minimal-cloudimg-amd64-root.tar.xz
+
+# Create two new workspaces (will be stored in /tmp/setB/workspace)
+sudo devbox workspace-add wsC bioD bioE
+sudo devbox workspace-add wsD bioE bioF
+
+tree -L 3 /tmp/setB/
+# /tmp/setB
+# ├── devbox
+# │   ├── bioD
+# │   │   ├── config.yaml
+# │   │   ├── ...
+# │   │   └── var
+# │   ├── bioE
+# │   │   ├── config.yaml
+# │   │   ├── ...
+# │   │   └── var
+# │   ├── bioF
+# │   │   ├── config.yaml
+# │   │   ├── ...
+# │   │   └── var
+# │   └── ubuntu-18.04-minimal-cloudimg-amd64-root.tar.xz
+# └── workspace
+#     ├── wsC
+#     │   ├── config.yaml
+#     │   ├── bioD.tar.gz
+#     │   └── bioE.tar.gz
+#     └── wsD
+#         ├── config.yaml
+#         ├── bioE.tar.gz
+#         └── bioF.tar.gz
+```
+
 # Usage Examples
 ## DevBoxes
 ```bash
@@ -140,25 +225,25 @@ Before creating a workspace you first need to create one or more devboxes, as sh
 # Create workspace with the DevBoxes 
 # `bionic` (0 second startup delay) and 
 # `kinetic` (5 second startup delay)
-sudo devbox workspace-add /tmp/my-workspace/ bionic kinetic:5
+sudo devbox workspace-add my-workspace bionic kinetic:5
 
 # Assign three IPs to the workspace
-sudo devbox workspace-ip-add /tmp/my-workspace/ 192.168.0.1 192.168.0.2 10.0.0.1
+sudo devbox workspace-ip-add my-workspace 192.168.0.1 192.168.0.2 10.0.0.1
 
 # Remove one IP from the workspace
-sudo devbox workspace-ip-remove /tmp/my-workspace/ 10.0.0.1
+sudo devbox workspace-ip-remove my-workspace 10.0.0.1
 
 # Launch the workspace
-sudo devbox workspace-launch /tmp/my-workspace/
+sudo devbox workspace-launch my-workspace
 
 # Store the workspace
-sudo devbox workspace-store /tmp/my-workspace/ ~/my-workspace.tar.gz
+sudo devbox workspace-store my-workspace ~/my-workspace.tar.gz
 
 # Destroy the workspace
-sudo devbox workspace-destroy /tmp/my-workspace/
+sudo devbox workspace-destroy my-workspace
 
 # Restore the workspace
-sudo devbox workspace-restore /tmp/my-workspace/ ~/my-workspace.tar.gz
+sudo devbox workspace-restore my-workspace ~/my-workspace.tar.gz
 ```
 
 ## Technologies Used
