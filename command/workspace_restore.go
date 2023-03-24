@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/toxyl/devbox/config"
@@ -48,6 +49,15 @@ func WorkspaceRestore(arg ...string) error {
 	}
 	w.Path = dstDir
 	w.Save(file)
+
+	// remove the image files to save diskspace
+	for _, c := range w.Devboxes {
+		err = os.Remove(c.Image)
+		if err != nil {
+			return err
+		}
+	}
+
 	log.Success("Restored workspace to %s", glog.File(dstDir))
 	return nil
 }
