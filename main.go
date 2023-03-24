@@ -39,7 +39,7 @@ func main() {
 
 	core.RegisterCommand(
 		command.MAKE,
-		"Creates a new `devbox` from a `tarball` (either filepath or URL).\nIf `tarball` is a local file it will be unpacked to the devbox location.\nIf `tarball`` is a URL the file will be downloaded first and then unpacked.",
+		"Creates a new `devbox` from a `tarball` (either filepath or URL).\nIf `tarball` is a local file it will be unpacked to the devbox location.\nIf `tarball` is a URL the file will be downloaded first and then unpacked.",
 		core.ArgInfoList{
 			{
 				Type:    core.ARG_TYPE_DEVBOX_LIST,
