@@ -27,6 +27,7 @@ const (
 
 const (
 	ARG_TYPE_DIR = iota
+	ARG_TYPE_BOOL
 	ARG_TYPE_FILE
 	ARG_TYPE_TARBALL
 	ARG_TYPE_IP

@@ -287,7 +287,7 @@ func main() {
 	)
 
 	core.RegisterCommand(
-		command.REPO_CONFIG,
+		command.REPO_SERVER_CONFIG,
 		"Configures the repo server.",
 		core.ArgInfoList{
 			{
@@ -304,22 +304,37 @@ func main() {
 				Name:     "path",
 				Example:  "/tmp/my-repo/",
 			},
+		},
+		command.RepoServerConfig,
+	)
+
+	core.RegisterCommand(
+		command.REPO_SERVER_USER_ADD,
+		"Adds a user to the repo server.\nIf the third argument is 'true' the user will be created with admin privileges.",
+		core.ArgInfoList{
 			{
 				Optional: false,
 				Variadic: false,
 				Type:     core.ARG_TYPE_COMMAND,
-				Name:     "admin user",
-				Example:  "admin",
+				Name:     "name",
+				Example:  "user",
 			},
 			{
 				Optional: false,
 				Variadic: false,
 				Type:     core.ARG_TYPE_COMMAND,
-				Name:     "admin password",
-				Example:  "password12345",
+				Name:     "password",
+				Example:  "password123",
+			},
+			{
+				Optional: true,
+				Variadic: false,
+				Type:     core.ARG_TYPE_BOOL,
+				Name:     "admin",
+				Example:  "true",
 			},
 		},
-		command.RepoConfig,
+		command.RepoServerUserAdd,
 	)
 
 	core.RegisterCommand(
@@ -327,6 +342,35 @@ func main() {
 		"Starts the repo server.",
 		core.ArgInfoList{},
 		command.RepoServer,
+	)
+
+	core.RegisterCommand(
+		command.REPO_CLIENT_CONFIG,
+		"Configures the repo client.",
+		core.ArgInfoList{
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "address",
+				Example:  "127.0.0.1:438",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "user",
+				Example:  "user",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "password",
+				Example:  "password123",
+			},
+		},
+		command.RepoClientConfig,
 	)
 
 	core.RegisterCommand(

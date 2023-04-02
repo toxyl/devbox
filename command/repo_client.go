@@ -7,8 +7,8 @@ import (
 )
 
 func RepoDownload(arg ...string) error {
-	client := repo.NewClient(core.AppConfig.RepoAdminUser, core.AppConfig.RepoAdminPassword)
-	err := client.Connect(core.AppConfig.RepoAddress)
+	client := repo.NewClient(core.AppConfig.Repo.Client.User, core.AppConfig.Repo.Client.Password)
+	err := client.Connect(core.AppConfig.Repo.Client.Address)
 	if err != nil {
 		log.Error("Could not connect to repo server: %s", glog.Error(err))
 		return nil
@@ -21,8 +21,8 @@ func RepoDownload(arg ...string) error {
 }
 
 func RepoUpload(arg ...string) error {
-	client := repo.NewClient(core.AppConfig.RepoAdminUser, core.AppConfig.RepoAdminPassword)
-	err := client.Connect(core.AppConfig.RepoAddress)
+	client := repo.NewClient(core.AppConfig.Repo.Client.User, core.AppConfig.Repo.Client.Password)
+	err := client.Connect(core.AppConfig.Repo.Client.Address)
 	if err != nil {
 		log.Error("Could not connect to repo server: %s", glog.Error(err))
 		return nil

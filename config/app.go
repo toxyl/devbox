@@ -4,17 +4,37 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
-	"github.com/toxyl/gutils"
 	"gopkg.in/yaml.v2"
 )
 
+type RepoUserConfig struct {
+	Admin    bool   `mapstructure:"admin" yaml:"admin"`
+	Name     string `mapstructure:"name" yaml:"name"`
+	Password string `mapstructure:"password" yaml:"password"`
+}
+
+type RepoServerConfig struct {
+	Path    string           `mapstructure:"path" yaml:"path"`
+	Address string           `mapstructure:"address" yaml:"address"`
+	Users   []RepoUserConfig `mapstructure:"users" yaml:"users"`
+}
+
+type RepoClientConfig struct {
+	Address  string `mapstructure:"address" yaml:"address"`
+	User     string `mapstructure:"user" yaml:"user"`
+	Password string `mapstructure:"password" yaml:"password"`
+}
+
+type RepoConfig struct {
+	Server RepoServerConfig `mapstructure:"server" yaml:"server"`
+	Client RepoClientConfig `mapstructure:"client" yaml:"client"`
+}
+
 type AppConfig struct {
-	StoragePath       string `mapstructure:"storage_path" yaml:"storage_path"`
-	RepoAdminUser     string `mapstructure:"repo_admin_user" yaml:"repo_admin_user"`
-	RepoAdminPassword string `mapstructure:"repo_admin_password" yaml:"repo_admin_password"`
-	RepoAddress       string `mapstructure:"repo_address" yaml:"repo_address"`
-	RepoPath          string `mapstructure:"repo_path" yaml:"repo_path"`
+	StoragePath string     `mapstructure:"storage_path" yaml:"storage_path"`
+	Repo        RepoConfig `mapstructure:"repo" yaml:"repo"`
 }
 
 func (c *AppConfig) Path() string {
@@ -23,10 +43,6 @@ func (c *AppConfig) Path() string {
 		return ""
 	}
 	return filepath.Join(cdir, ".devbox.yaml")
-}
-
-func (c *AppConfig) TestCredentials(user, password string) bool {
-	return user == c.RepoAdminUser && gutils.StringToSha256(c.RepoAdminPassword) == password
 }
 
 func (c *AppConfig) Save() error {
@@ -51,20 +67,37 @@ func (c *AppConfig) Load() error {
 	}
 
 	c.StoragePath = conf.StoragePath
-	c.RepoAdminUser = conf.RepoAdminUser
-	c.RepoAdminPassword = conf.RepoAdminPassword
-	c.RepoAddress = conf.RepoAddress
-	c.RepoPath = conf.RepoPath
+	c.Repo.Client.Address = conf.Repo.Client.Address
+	c.Repo.Client.User = conf.Repo.Client.User
+	c.Repo.Client.Password = conf.Repo.Client.Password
+	c.Repo.Server.Address = conf.Repo.Server.Address
+	c.Repo.Server.Path = conf.Repo.Server.Path
+	c.Repo.Server.Users = conf.Repo.Server.Users
+
 	return nil
 }
 
 func NewAppConfig() *AppConfig {
 	ac := &AppConfig{
-		StoragePath:       os.TempDir(),
-		RepoAdminUser:     "admin",
-		RepoAdminPassword: "admin",
-		RepoAddress:       "127.0.0.1:438",
-		RepoPath:          filepath.Join(os.TempDir(), "repo"),
+		StoragePath: os.TempDir(),
+		Repo: RepoConfig{
+			Server: RepoServerConfig{
+				Path:    filepath.Join(os.TempDir(), "repo"),
+				Address: "127.0.0.1:438",
+				Users: []RepoUserConfig{
+					{
+						Admin:    true,
+						Name:     "admin",
+						Password: fmt.Sprint(time.Now().Unix()),
+					},
+				},
+			},
+			Client: RepoClientConfig{
+				Address:  "127.0.0.1:438",
+				User:     "user",
+				Password: fmt.Sprint(time.Now().Unix()),
+			},
+		},
 	}
 	return ac
 }

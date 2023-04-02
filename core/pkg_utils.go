@@ -20,7 +20,7 @@ func GetStorageDir() string {
 }
 
 func GetRepoDir() string {
-	return AppConfig.RepoPath
+	return AppConfig.Repo.Server.Path
 }
 
 func GetWorkspaceDir() string {
