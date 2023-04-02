@@ -24,18 +24,11 @@ func main() {
 	core.InitErrorRegistry()
 
 	// check if AppConfig exists, else create default one
-	ac := config.NewAppConfig()
-	if !core.FileExists(ac.Path()) {
-		if err := ac.Save(); err != nil {
-			core.ForceFatal("could not create default app config")
-		}
-	}
-	err := ac.Load()
+	ac, err := config.OpenAppConfig()
 	if err != nil {
-		core.ForceFatal("could not load app config")
+		core.ForceFatal(err.Error())
 	}
-
-	core.SetStorageDir(ac.StoragePath)
+	core.AppConfig = ac
 
 	core.RegisterCommand(
 		command.MAKE,
@@ -290,6 +283,101 @@ func main() {
 			},
 		},
 		command.StoragePathSet,
+	)
+
+	core.RegisterCommand(
+		"repo-credentials",
+		"Set the credentials for admin access to the repo server.",
+		core.ArgInfoList{
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "user",
+				Example:  "admin",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "password",
+				Example:  "password12345",
+			},
+		},
+		command.RepoCredentialsSet,
+	)
+
+	core.RegisterCommand(
+		"repo-server",
+		"Starts the repo server.",
+		core.ArgInfoList{
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "address",
+				Example:  "127.0.0.1:80",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "base path",
+				Example:  "/tmp",
+			},
+		},
+		command.RepoServer,
+	)
+
+	core.RegisterCommand(
+		"repo-download",
+		"Downloads a file from the repo server.",
+		core.ArgInfoList{
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "address",
+				Example:  "127.0.0.1:80",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "file",
+				Example:  "hello.txt",
+			},
+		},
+		command.RepoDownload,
+	)
+
+	core.RegisterCommand(
+		"repo-upload",
+		"Uploads a file to the repo server.\nRequires credentials to be set via repo-credentials.",
+		core.ArgInfoList{
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "address",
+				Example:  "127.0.0.1:80",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "file src",
+				Example:  "hello.txt",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "file dst",
+				Example:  "world.txt",
+			},
+		},
+		command.RepoUpload,
 	)
 
 	// Hidden Commands
