@@ -47,7 +47,7 @@ func (s *Server) handleUpload(conn net.Conn, scanner *bufio.Scanner) {
 		return
 	}
 
-	file, err := os.Open(filePath)
+	file, err := os.Create(filePath)
 	if err != nil {
 		// create dirs and file
 		err = os.MkdirAll(filepath.Dir(filePath), 0755)
@@ -55,6 +55,7 @@ func (s *Server) handleUpload(conn net.Conn, scanner *bufio.Scanner) {
 			fmt.Fprintln(conn, "ERROR Could not create dir:", err.Error())
 			return
 		}
+		file.Close()
 		file, err = os.Create(filePath)
 		if err != nil {
 			fmt.Fprintln(conn, "ERROR Could not create file:", err.Error())
@@ -62,11 +63,6 @@ func (s *Server) handleUpload(conn net.Conn, scanner *bufio.Scanner) {
 		}
 	}
 	defer file.Close()
-	// Seek to the beginning of the file
-	if _, err := file.Seek(0, 0); err != nil {
-		fmt.Fprintln(conn, "ERROR Failed to seek file")
-		return
-	}
 
 	// Signal the client that we are ready to receive
 	fmt.Fprintln(conn, "READY")

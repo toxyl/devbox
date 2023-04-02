@@ -10,21 +10,23 @@ import (
 	"github.com/toxyl/glog"
 )
 
-func WorkspaceRestore(arg ...string) error {
-	tarFile := arg[1]
-	tarFile, err := filepath.Abs(tarFile)
-	if err != nil {
-		return err
-	}
-	if !fileExists(tarFile) {
-		forceExit("The source file does not exist: "+glog.File(tarFile), core.EXIT_WORKSPACE_RESTORE_FAILED)
-	}
-
+func WorkspacePull(arg ...string) error {
 	name := arg[0]
 	dstDir := getWorkspacePath(name)
-	dstDir, err = filepath.Abs(dstDir)
+	dstDir, err := filepath.Abs(dstDir)
 	if err != nil {
 		return err
+	}
+
+	tarFileLocal := name + ".tar.gz"
+	tarFile := "workspace_" + tarFileLocal
+	err = RepoDownload(tarFile, tarFileLocal)
+	if err != nil {
+		return err
+	}
+	tarFile = filepath.Join(getStorageDir(), tarFileLocal)
+	if !fileExists(tarFile) {
+		forceExit("The source file does not exist: "+glog.File(tarFile), core.EXIT_WORKSPACE_PULL_FAILED)
 	}
 	log.Success("Restoring workspace from %s", glog.File(tarFile))
 

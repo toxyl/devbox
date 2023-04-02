@@ -10,7 +10,7 @@ import (
 	"github.com/toxyl/glog"
 )
 
-func WorkspaceStore(arg ...string) error {
+func WorkspacePush(arg ...string) error {
 	name := arg[0]
 	path := getWorkspacePath(name)
 	path, err := filepath.Abs(path)
@@ -18,10 +18,10 @@ func WorkspaceStore(arg ...string) error {
 		return err
 	}
 	if !fileExists(path) {
-		forceExit("The source directory does not exist: "+glog.File(path), core.EXIT_WORKSPACE_STORE_FAILED)
+		forceExit("The source directory does not exist: "+glog.File(path), core.EXIT_WORKSPACE_PUSH_FAILED)
 	}
-
-	tarfile := arg[1]
+	tarname := name + ".tar.gz"
+	tarfile := filepath.Join(getStorageDir(), tarname)
 	tarfile, err = filepath.Abs(tarfile)
 	if err != nil {
 		return err
@@ -41,7 +41,7 @@ func WorkspaceStore(arg ...string) error {
 	}
 	err = tar.FromDir(path, tarfile)
 	if err != nil {
-		forceExit("Could not store workspace to "+glog.File(tarfile)+": "+glog.Error(err), core.EXIT_WORKSPACE_STORE_FAILED)
+		forceExit("Could not store workspace to "+glog.File(tarfile)+": "+glog.Error(err), core.EXIT_WORKSPACE_PUSH_FAILED)
 	}
 
 	// remove the image files to save diskspace
@@ -53,5 +53,6 @@ func WorkspaceStore(arg ...string) error {
 	}
 
 	log.Success("Stored workspace to %s", glog.File(tarfile))
-	return nil
+
+	return RepoUpload(tarfile, "workspace_"+tarname)
 }

@@ -12,11 +12,12 @@ import (
 	"github.com/toxyl/glog"
 )
 
-func (c *Client) DownloadFile(fileName string) error {
-	fileHash := utils.FileToSha256(fileName)
-	fileName = filepath.Base(fileName)
-	fmt.Fprintln(c.conn, "DOWNLOAD", fileName, fileHash, c.user, c.password)
-	return c.download(fileName)
+func (c *Client) DownloadFile(fileNameRemote, fileNameLocal, storagePath string) error {
+	fileNameBase := filepath.Base(fileNameLocal)
+	fileNameLocal = filepath.Join(storagePath, fileNameBase)
+	fileHash := utils.FileToSha256(fileNameLocal)
+	fmt.Fprintln(c.conn, "DOWNLOAD", filepath.Base(fileNameRemote), fileHash, c.user, c.password)
+	return c.download(fileNameLocal)
 }
 
 func (c *Client) download(filePath string) error {

@@ -238,6 +238,31 @@ func main() {
 		},
 		command.WorkspaceRestore,
 	)
+	core.RegisterCommand(
+		command.WORKSPACE_PUSH,
+		"Stores the workspace `name` as .tar.gz and pushes it to the repo server.",
+		core.ArgInfoList{
+			{
+				Type:    core.ARG_TYPE_WORKSPACE_LIST,
+				Name:    "name",
+				Example: "my-workspace",
+			},
+		},
+		command.WorkspacePush,
+	)
+
+	core.RegisterCommand(
+		command.WORKSPACE_PULL,
+		"Restores the workspace `name` from the repo server.\n"+glog.Bold()+glog.WrapOrange("Warning:")+glog.Reset()+" Existing devboxes will be overwritten!",
+		core.ArgInfoList{
+			{
+				Type:    core.ARG_TYPE_WORKSPACE_LIST,
+				Name:    "name",
+				Example: "my-workspace",
+			},
+		},
+		command.WorkspacePull,
+	)
 
 	core.RegisterCommand(
 		command.WORKSPACE_DETACH,
@@ -380,24 +405,31 @@ func main() {
 		command.RepoServer,
 	)
 
-	core.RegisterCommand(
+	// Hidden Commands
+	// These are not shown in help texts and used internally.
+	core.RegisterHiddenCommand(
 		command.REPO_DOWNLOAD,
-		"Downloads a file from the repo server.",
 		core.ArgInfoList{
 			{
 				Optional: false,
 				Variadic: false,
 				Type:     core.ARG_TYPE_COMMAND,
-				Name:     "file",
+				Name:     "file src",
 				Example:  "hello.txt",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "file dst",
+				Example:  "world.txt",
 			},
 		},
 		command.RepoDownload,
 	)
 
-	core.RegisterCommand(
+	core.RegisterHiddenCommand(
 		command.REPO_UPLOAD,
-		"Uploads a file to the repo server.\nRequires credentials to be set via repo-admin.",
 		core.ArgInfoList{
 			{
 				Optional: false,
@@ -417,8 +449,6 @@ func main() {
 		command.RepoUpload,
 	)
 
-	// Hidden Commands
-	// These are not shown in help texts and used internally.
 	core.RegisterHiddenCommand(
 		command.SPAWN,
 		core.ArgInfoList{

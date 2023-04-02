@@ -111,6 +111,8 @@ func (s *Server) handleRequest(conn net.Conn) {
 		s.handleDownload(conn, scanner)
 	case "UPLOAD":
 		s.handleUpload(conn, scanner)
+	case "CHECK":
+		s.handleCheck(conn, scanner)
 	default:
 		fmt.Fprintln(conn, "ERROR Unknown command")
 		return

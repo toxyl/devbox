@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/toxyl/devbox/utils"
@@ -17,9 +16,8 @@ func (c *Client) UploadFile(fileNameSrc, fileNameDst string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	f.Close()
 	fileHash := utils.FileToSha256(fileNameSrc)
-	fileNameSrc = filepath.Base(fileNameSrc)
 	fmt.Fprintln(c.conn, "UPLOAD", fileNameDst, fileHash, c.user, c.password)
 	return c.upload(fileNameSrc)
 }

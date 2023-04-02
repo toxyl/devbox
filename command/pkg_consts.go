@@ -16,6 +16,8 @@ const (
 	WORKSPACE_RESTORE   = "workspace-restore"
 	WORKSPACE_DESTROY   = "workspace-destroy"
 	WORKSPACE_DETACH    = "workspace-detach"
+	WORKSPACE_PUSH      = "workspace-push"
+	WORKSPACE_PULL      = "workspace-pull"
 	STORAGE_PATH        = "storage-path"
 	REPO_SERVER_INFO    = "repo-server-info"
 	REPO_SERVER_CONFIG  = "repo-server-config"
