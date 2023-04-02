@@ -139,6 +139,13 @@ func (ai *ArgInfo) Completion() bashcompletion.Completion {
 			Compopt:     []string{},
 			Shopt:       []string{},
 		}
+	case ARG_TYPE_BOOL:
+		return bashcompletion.Completion{
+			Variadic:    ai.Variadic,
+			Completions: "($(compgen -W \"true false\" -- $cur))",
+			Compopt:     []string{},
+			Shopt:       []string{},
+		}
 	}
 	return bashcompletion.Completion{
 		Variadic:    ai.Variadic,

@@ -7,6 +7,7 @@ require (
 	github.com/godbus/dbus/v5 v5.1.0
 	github.com/spf13/viper v1.15.0
 	github.com/toxyl/glog v1.0.0-alpha.4
+	github.com/toxyl/gutils v0.0.0-20230215220424-563d5e053cff
 	gopkg.in/yaml.v2 v2.4.0
 )
 

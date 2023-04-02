@@ -19,23 +19,16 @@ func main() {
 	glog.LoggerConfig.ShowSubsystem = false
 	glog.LoggerConfig.ShowDateTime = false
 	glog.LoggerConfig.ShowRuntimeMilliseconds = false
-	glog.LoggerConfig.ShowRuntimeSeconds = true
+	glog.LoggerConfig.ShowRuntimeSeconds = false
 
 	core.InitErrorRegistry()
 
 	// check if AppConfig exists, else create default one
-	ac := config.NewAppConfig()
-	if !core.FileExists(ac.Path()) {
-		if err := ac.Save(); err != nil {
-			core.ForceFatal("could not create default app config")
-		}
-	}
-	err := ac.Load()
+	ac, err := config.OpenAppConfig()
 	if err != nil {
-		core.ForceFatal("could not load app config")
+		core.ForceFatal(err.Error())
 	}
-
-	core.SetStorageDir(ac.StoragePath)
+	core.AppConfig = ac
 
 	core.RegisterCommand(
 		command.MAKE,
@@ -245,6 +238,31 @@ func main() {
 		},
 		command.WorkspaceRestore,
 	)
+	core.RegisterCommand(
+		command.WORKSPACE_PUSH,
+		"Stores the workspace `name` as .tar.gz and pushes it to the repo server.",
+		core.ArgInfoList{
+			{
+				Type:    core.ARG_TYPE_WORKSPACE_LIST,
+				Name:    "name",
+				Example: "my-workspace",
+			},
+		},
+		command.WorkspacePush,
+	)
+
+	core.RegisterCommand(
+		command.WORKSPACE_PULL,
+		"Restores the workspace `name` from the repo server.\n"+glog.Bold()+glog.WrapOrange("Warning:")+glog.Reset()+" Existing devboxes will be overwritten!",
+		core.ArgInfoList{
+			{
+				Type:    core.ARG_TYPE_WORKSPACE_LIST,
+				Name:    "name",
+				Example: "my-workspace",
+			},
+		},
+		command.WorkspacePull,
+	)
 
 	core.RegisterCommand(
 		command.WORKSPACE_DETACH,
@@ -273,23 +291,118 @@ func main() {
 	)
 
 	core.RegisterCommand(
-		command.STORAGE_PATH_GET,
-		"Displays the currently used storage path for DevBoxes and workspaces.",
-		core.ArgInfoList{},
-		command.StoragePathGet,
+		command.STORAGE_PATH,
+		"Displays or sets the storage path for DevBoxes and workspaces.",
+		core.ArgInfoList{
+			{
+				Optional: true,
+				Type:     core.ARG_TYPE_DIR,
+				Name:     "path",
+				Example:  "/tmp/my-workspace/",
+			},
+		},
+		command.StoragePath,
 	)
 
 	core.RegisterCommand(
-		command.STORAGE_PATH_SET,
-		"Sets the storage path for DevBoxes and workspaces.\nDon't forget to run `exec bash` to refresh the Bash completions.",
+		command.REPO_CLIENT_INFO,
+		"Displays the currently used repo client settings.",
+		core.ArgInfoList{},
+		command.RepoClientInfo,
+	)
+
+	core.RegisterCommand(
+		command.REPO_CLIENT_CONFIG,
+		"Configures the repo client.",
 		core.ArgInfoList{
 			{
-				Type:    core.ARG_TYPE_DIR,
-				Name:    "path",
-				Example: "/tmp/my-workspace/",
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "address",
+				Example:  "127.0.0.1:438",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "user",
+				Example:  "user",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "password",
+				Example:  "password123",
 			},
 		},
-		command.StoragePathSet,
+		command.RepoClientConfig,
+	)
+
+	core.RegisterCommand(
+		command.REPO_SERVER_INFO,
+		"Displays the currently used repo server settings.",
+		core.ArgInfoList{},
+		command.RepoServerInfo,
+	)
+
+	core.RegisterCommand(
+		command.REPO_SERVER_CONFIG,
+		"Configures the repo server.",
+		core.ArgInfoList{
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "address",
+				Example:  "127.0.0.1:438",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_DIR,
+				Name:     "path",
+				Example:  "/tmp/my-repo/",
+			},
+		},
+		command.RepoServerConfig,
+	)
+
+	core.RegisterCommand(
+		command.REPO_SERVER_USER,
+		"Adds a user to the repo server or updates an existing user.\nIf the third argument is 'true' the user will be created with admin privileges.",
+		core.ArgInfoList{
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "user",
+				Example:  "user",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "password",
+				Example:  "password123",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_BOOL,
+				Name:     "admin",
+				Example:  "true",
+			},
+		},
+		command.RepoServerUserAdd,
+	)
+
+	core.RegisterCommand(
+		command.REPO_SERVER,
+		"Starts the repo server.",
+		core.ArgInfoList{},
+		command.RepoServer,
 	)
 
 	// Hidden Commands

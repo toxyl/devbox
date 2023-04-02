@@ -1,11 +1,8 @@
 package core
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/toxyl/glog"
 )
 
 func FileExists(path string) bool {
@@ -18,20 +15,16 @@ func FileExists(path string) bool {
 	return err == nil
 }
 
-func SetStorageDir(path string) error {
-	if !FileExists(path) {
-		return fmt.Errorf("target directory does not exist: %s", glog.File(path))
-	}
-	storagePath = path
-	return nil
+func GetStorageDir() string {
+	return AppConfig.StoragePath
 }
 
-func GetStorageDir() string {
-	return storagePath
+func GetRepoDir() string {
+	return AppConfig.Repo.Server.Path
 }
 
 func GetWorkspaceDir() string {
-	return filepath.Join(storagePath, "workspace")
+	return filepath.Join(AppConfig.StoragePath, "workspace")
 }
 
 func GetWorkspaceConfigPath(name string) string {
@@ -43,7 +36,7 @@ func GetWorkspacePath(name string) string {
 }
 
 func GetDevboxDir() string {
-	return filepath.Join(storagePath, "devbox")
+	return filepath.Join(AppConfig.StoragePath, "devbox")
 }
 
 func GetDevboxPath(name string) string {

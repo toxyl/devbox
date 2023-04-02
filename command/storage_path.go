@@ -8,12 +8,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/toxyl/devbox/config"
 	"github.com/toxyl/devbox/core"
 	"github.com/toxyl/glog"
 )
 
-func StoragePathSet(arg ...string) error {
+func StoragePath(arg ...string) error {
+	if len(arg) == 0 {
+		log.OK("Current storage directory: %s", glog.File(core.GetStorageDir()))
+		return nil
+	}
+
 	path := arg[0]
 	path, err := filepath.Abs(path)
 	if err != nil {
@@ -42,14 +46,10 @@ func StoragePathSet(arg ...string) error {
 			return errors.Join(err, fmt.Errorf("could not create target directory"))
 		}
 	}
-	c := &config.AppConfig{
-		StoragePath: path,
-	}
-	if err := c.Save(); err != nil {
+	core.AppConfig.StoragePath = path
+	if err := core.AppConfig.Save(); err != nil {
 		return errors.Join(err, fmt.Errorf("could not save app config"))
 	}
-
-	core.SetStorageDir(c.StoragePath)
 
 	UpdateBashCompletions()
 	log.Success("Storage path updated!")

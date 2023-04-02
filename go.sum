@@ -184,6 +184,8 @@ github.com/subosito/gotenv v1.4.2 h1:X1TuBLAMDFbaTAChgCBLu3DU3UPyELpnF2jjJ2cz/S8
 github.com/subosito/gotenv v1.4.2/go.mod h1:ayKnFf/c6rvx/2iiLrJUk1e6plDbT3edrFNGqEflhK0=
 github.com/toxyl/glog v1.0.0-alpha.4 h1:up4q/92TQqzMB5zPm22b+asupQi8Qnfbs1VE1QBpDNI=
 github.com/toxyl/glog v1.0.0-alpha.4/go.mod h1:9O3jnsSIofADRdzJ+7LN17N+NcmaoTSJvCsbFOQFjN8=
+github.com/toxyl/gutils v0.0.0-20230215220424-563d5e053cff h1:F66fuch9DS0ly+BoxwAQwBYSx/STZ551fKk3l1tTU1o=
+github.com/toxyl/gutils v0.0.0-20230215220424-563d5e053cff/go.mod h1:vwGE/QEaI/Elm2wzoFQ/YiDrI9qd7+jSq+CtzHz/p5M=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

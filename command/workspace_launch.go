@@ -2,16 +2,61 @@ package command
 
 import (
 	"fmt"
+	"strings"
+	"time"
 
 	"github.com/toxyl/devbox/config"
 	"github.com/toxyl/devbox/core"
 	"github.com/toxyl/devbox/devip"
+	"github.com/toxyl/devbox/repo"
 	"github.com/toxyl/devbox/tmux"
 	"github.com/toxyl/glog"
 )
 
 func WorkspaceLaunch(arg ...string) error {
 	name := arg[0]
+
+	tarFileLocal := name + ".tar.gz"
+	tarFileRemote := "workspace_" + name + ".tar.gz"
+
+	log.Info("Checking %s...", glog.File(tarFileRemote))
+	client := repo.NewClient(core.AppConfig.Repo.Client.User, core.AppConfig.Repo.Client.Password)
+	err := client.Connect(core.AppConfig.Repo.Client.Address)
+	if err == nil {
+		uptodate, err := client.CheckIfFileIsUpToDate(tarFileLocal, tarFileRemote, getStorageDir())
+		if err != nil {
+			if err.Error() == "ERROR File not found" {
+				uptodate = true
+			} else {
+				forceExit("Could not check if file is up-to-date: "+glog.Error(err), core.EXIT_REPO_CHECK_FAILED)
+			}
+		}
+		if !uptodate {
+			log.Question("There is a newer workspace version, update? [y|N] " + glog.StoreCursor())
+			time.Sleep(100 * time.Millisecond)
+			fmt.Print(glog.RestoreCursor())
+			var response string
+			_, err := fmt.Scanln(&response)
+			ok := false
+			if err == nil {
+				switch strings.ToLower(response) {
+				case "y", "yes":
+					ok = true
+				case "n", "no":
+					ok = false
+				default:
+					ok = false
+				}
+			}
+			if ok {
+				err = WorkspacePull(name)
+				if err != nil {
+					forceExit("Could not download file from repo server: "+glog.Error(err), core.EXIT_REPO_DOWNLOAD_FAILED)
+				}
+			}
+		}
+	}
+
 	file := getWorkspaceConfigPath(name)
 
 	if !fileExists(file) {
