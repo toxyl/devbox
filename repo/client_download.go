@@ -24,6 +24,11 @@ func (pw *ProgressWriter) Write(p []byte) (n int, err error) {
 	pw.Total += int64(n)
 	if pw.Total%pw.ReportInterval == 0 && pw.Callback != nil {
 		pw.Callback(pw.Total)
+		if fw, ok := pw.w.(*os.File); ok {
+			if err := fw.Sync(); err != nil {
+				return n, err
+			}
+		}
 	}
 	return
 }
