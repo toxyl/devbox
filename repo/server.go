@@ -36,34 +36,36 @@ func NewServer(basePath string) *Server {
 func (s *Server) AddAdmin(name, password string) {
 	for i, u := range s.users {
 		if u.name == name {
-			s.users[i].password = password
+			s.users[i].admin = true
+			s.users[i].password = utils.StringToSha256(password)
 			return
 		}
 	}
 	s.users = append(s.users, user{
 		admin:    true,
 		name:     name,
-		password: password,
+		password: utils.StringToSha256(password),
 	})
 }
 
 func (s *Server) AddUser(name, password string) {
 	for i, u := range s.users {
 		if u.name == name {
-			s.users[i].password = password
+			s.users[i].admin = false
+			s.users[i].password = utils.StringToSha256(password)
 			return
 		}
 	}
 	s.users = append(s.users, user{
 		admin:    false,
 		name:     name,
-		password: password,
+		password: utils.StringToSha256(password),
 	})
 }
 
 func (s *Server) isAdmin(name, password string) bool {
-	for i, u := range s.users {
-		if u.name == name && u.admin && utils.StringToSha256(s.users[i].password) == password {
+	for _, u := range s.users {
+		if u.name == name && u.admin && u.password == password {
 			return true
 		}
 	}
@@ -72,8 +74,8 @@ func (s *Server) isAdmin(name, password string) bool {
 }
 
 func (s *Server) isUser(name, password string) bool {
-	for i, u := range s.users {
-		if u.name == name && utils.StringToSha256(s.users[i].password) == password {
+	for _, u := range s.users {
+		if u.name == name && u.password == password {
 			return true
 		}
 	}

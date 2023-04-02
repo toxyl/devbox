@@ -7,6 +7,7 @@ import (
 
 	"github.com/toxyl/devbox/config"
 	"github.com/toxyl/devbox/core"
+	"github.com/toxyl/devbox/utils"
 )
 
 func RepoServerUserAdd(arg ...string) error {
@@ -19,7 +20,7 @@ func RepoServerUserAdd(arg ...string) error {
 	add := true
 	for i, u := range core.AppConfig.Repo.Server.Users {
 		if u.Name == name {
-			core.AppConfig.Repo.Server.Users[i].Password = password
+			core.AppConfig.Repo.Server.Users[i].Password = utils.StringToSha256(password)
 			core.AppConfig.Repo.Server.Users[i].Admin = admin
 			add = false
 			break
@@ -29,7 +30,7 @@ func RepoServerUserAdd(arg ...string) error {
 		core.AppConfig.Repo.Server.Users = append(core.AppConfig.Repo.Server.Users, config.RepoUserConfig{
 			Admin:    admin,
 			Name:     name,
-			Password: password,
+			Password: utils.StringToSha256(password),
 		})
 	}
 	if err := core.AppConfig.Save(); err != nil {
