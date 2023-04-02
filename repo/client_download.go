@@ -70,7 +70,7 @@ func (c *Client) download(filePath string) error {
 		fmt.Fprintln(c.conn, "READY")
 
 		logClient.Info(
-			"Downloading %s from %s",
+			"Downloading %s from %s...",
 			glog.File(filePath),
 			glog.ConnRemote(c.conn, false),
 		)
@@ -80,10 +80,10 @@ func (c *Client) download(filePath string) error {
 			ReportInterval: 10, // report progress every 10s
 			Callback: func(total int64) {
 				logClient.Info(
-					"Downloading %s (%s) from %s...",
+					"Downloading %s from %s: %s...",
 					glog.File(filePath),
-					glog.HumanReadableBytesIEC(total),
 					glog.ConnRemote(c.conn, false),
+					glog.HumanReadableBytesIEC(total),
 				)
 			},
 		}
@@ -93,10 +93,10 @@ func (c *Client) download(filePath string) error {
 			return err
 		}
 		logClient.Success(
-			"Downloaded %s (%s) from %s",
+			"Downloaded %s from %s: %s total",
 			glog.File(filePath),
-			glog.HumanReadableBytesIEC(n),
 			glog.ConnRemote(c.conn, false),
+			glog.HumanReadableBytesIEC(n),
 		)
 	}
 
