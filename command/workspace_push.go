@@ -54,5 +54,7 @@ func WorkspacePush(arg ...string) error {
 
 	log.Success("Stored workspace to %s", glog.File(tarfile))
 
-	return RepoUpload(tarfile, "workspace_"+tarname)
+	RepoUpload(tarfile, "workspace_"+tarname)
+
+	return nil
 }

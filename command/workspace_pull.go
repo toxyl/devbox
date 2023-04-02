@@ -20,9 +20,9 @@ func WorkspacePull(arg ...string) error {
 
 	tarFileLocal := name + ".tar.gz"
 	tarFile := "workspace_" + tarFileLocal
-	err = RepoDownload(tarFile, tarFileLocal)
-	if err != nil {
-		return err
+	isNew := RepoDownload(tarFile, tarFileLocal)
+	if !isNew {
+		return nil // nothing to do then
 	}
 	tarFile = filepath.Join(getStorageDir(), tarFileLocal)
 	if !fileExists(tarFile) {

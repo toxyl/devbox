@@ -6,28 +6,27 @@ import (
 	"github.com/toxyl/glog"
 )
 
-func RepoDownload(arg ...string) error {
+func RepoDownload(fileNameRemote, fileNameLocal string) bool {
 	client := repo.NewClient(core.AppConfig.Repo.Client.User, core.AppConfig.Repo.Client.Password)
 	err := client.Connect(core.AppConfig.Repo.Client.Address)
 	if err != nil {
 		forceExit("Could not connect to repo server: "+glog.Error(err), core.EXIT_REPO_CONNECTION_FAILED)
 	}
-	err = client.DownloadFile(arg[0], arg[1], getStorageDir())
+	isNew, err := client.DownloadFile(fileNameRemote, fileNameLocal, getStorageDir())
 	if err != nil {
 		forceExit("Could not download file from repo server: "+glog.Error(err), core.EXIT_REPO_DOWNLOAD_FAILED)
 	}
-	return nil
+	return isNew
 }
 
-func RepoUpload(arg ...string) error {
+func RepoUpload(fileNameSrc, fileNameDst string) {
 	client := repo.NewClient(core.AppConfig.Repo.Client.User, core.AppConfig.Repo.Client.Password)
 	err := client.Connect(core.AppConfig.Repo.Client.Address)
 	if err != nil {
 		forceExit("Could not connect to repo server: "+glog.Error(err), core.EXIT_REPO_CONNECTION_FAILED)
 	}
-	err = client.UploadFile(arg[0], arg[1])
+	err = client.UploadFile(fileNameSrc, fileNameDst)
 	if err != nil {
-		forceExit("Could not upload file to repo server: "+glog.Error(err), core.EXIT_WORKSPACE_PUSH_FAILED)
+		forceExit("Could not upload file to repo server: "+glog.Error(err), core.EXIT_REPO_UPLOAD_FAILED)
 	}
-	return nil
 }

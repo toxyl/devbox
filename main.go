@@ -408,48 +408,6 @@ func main() {
 	// Hidden Commands
 	// These are not shown in help texts and used internally.
 	core.RegisterHiddenCommand(
-		command.REPO_DOWNLOAD,
-		core.ArgInfoList{
-			{
-				Optional: false,
-				Variadic: false,
-				Type:     core.ARG_TYPE_COMMAND,
-				Name:     "file src",
-				Example:  "hello.txt",
-			},
-			{
-				Optional: false,
-				Variadic: false,
-				Type:     core.ARG_TYPE_COMMAND,
-				Name:     "file dst",
-				Example:  "world.txt",
-			},
-		},
-		command.RepoDownload,
-	)
-
-	core.RegisterHiddenCommand(
-		command.REPO_UPLOAD,
-		core.ArgInfoList{
-			{
-				Optional: false,
-				Variadic: false,
-				Type:     core.ARG_TYPE_COMMAND,
-				Name:     "file src",
-				Example:  "hello.txt",
-			},
-			{
-				Optional: false,
-				Variadic: false,
-				Type:     core.ARG_TYPE_COMMAND,
-				Name:     "file dst",
-				Example:  "world.txt",
-			},
-		},
-		command.RepoUpload,
-	)
-
-	core.RegisterHiddenCommand(
 		command.SPAWN,
 		core.ArgInfoList{
 			{

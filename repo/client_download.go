@@ -41,7 +41,9 @@ func (pw *ProgressWriter) Wrap(w io.Writer) io.Writer {
 	return pw
 }
 
-func (c *Client) DownloadFile(fileNameRemote, fileNameLocal, storagePath string) error {
+// DownloadFile tries to download the file. If it returns `true, nil` then a new file has been downloaded.
+// Otherwise there was either an error or the file hasn't changed.
+func (c *Client) DownloadFile(fileNameRemote, fileNameLocal, storagePath string) (bool, error) {
 	fileNameBase := filepath.Base(fileNameLocal)
 	fileNameLocal = filepath.Join(storagePath, fileNameBase)
 	fileHash := utils.FileToSha256(fileNameLocal)
@@ -49,20 +51,20 @@ func (c *Client) DownloadFile(fileNameRemote, fileNameLocal, storagePath string)
 	return c.download(fileNameLocal)
 }
 
-func (c *Client) download(filePath string) error {
+func (c *Client) download(filePath string) (bool, error) {
 	// Print server response
 	response, err := bufio.NewReader(c.conn).ReadString('\n')
 	if err != nil {
-		return err
+		return false, err
 	}
 	if strings.HasPrefix(response, "ERROR") {
-		return fmt.Errorf(response)
+		return false, fmt.Errorf(response)
 	}
 	if strings.HasPrefix(response, "FILE") {
 		// got a file response
 		file, err := os.Create(filePath)
 		if err != nil {
-			return err
+			return false, err
 		}
 		defer file.Close()
 
@@ -90,15 +92,16 @@ func (c *Client) download(filePath string) error {
 
 		n, err := io.Copy(c.progressWriter.Wrap(file), c.conn)
 		if err != nil {
-			return err
+			return false, err
 		}
 		logClient.Success(
-			"Downloaded %s from %s: %s total",
+			"Downloaded  %s from %s: %s total",
 			glog.File(filePath),
 			glog.ConnRemote(c.conn, false),
 			glog.HumanReadableBytesIEC(n),
 		)
+		return true, nil
 	}
 
-	return nil
+	return false, nil
 }
