@@ -20,7 +20,7 @@ func (c *Client) UploadFile(fileNameSrc, fileNameDst string) error {
 	defer f.Close()
 	fileHash := utils.FileToSha256(fileNameSrc)
 	fileNameSrc = filepath.Base(fileNameSrc)
-	fmt.Fprintln(c.conn, "UPLOAD", fileNameDst, fileHash, c.user, utils.StringToSha256(c.password))
+	fmt.Fprintln(c.conn, "UPLOAD", fileNameDst, fileHash, c.user, c.password)
 	return c.upload(fileNameSrc)
 }
 

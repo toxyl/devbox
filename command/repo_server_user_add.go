@@ -14,7 +14,7 @@ func RepoServerUserAdd(arg ...string) error {
 	name := arg[0]
 	password := arg[1]
 	admin := false
-	if len(arg) == 3 && strings.TrimSpace(strings.ToLower(arg[2])) == "true" {
+	if strings.TrimSpace(strings.ToLower(arg[2])) == "true" {
 		admin = true
 	}
 	add := true

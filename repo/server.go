@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/toxyl/devbox/utils"
 	"github.com/toxyl/glog"
 )
 
@@ -37,14 +36,14 @@ func (s *Server) AddAdmin(name, password string) {
 	for i, u := range s.users {
 		if u.name == name {
 			s.users[i].admin = true
-			s.users[i].password = utils.StringToSha256(password)
+			s.users[i].password = password
 			return
 		}
 	}
 	s.users = append(s.users, user{
 		admin:    true,
 		name:     name,
-		password: utils.StringToSha256(password),
+		password: password,
 	})
 }
 
@@ -52,14 +51,14 @@ func (s *Server) AddUser(name, password string) {
 	for i, u := range s.users {
 		if u.name == name {
 			s.users[i].admin = false
-			s.users[i].password = utils.StringToSha256(password)
+			s.users[i].password = password
 			return
 		}
 	}
 	s.users = append(s.users, user{
 		admin:    false,
 		name:     name,
-		password: utils.StringToSha256(password),
+		password: password,
 	})
 }
 

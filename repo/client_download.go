@@ -15,7 +15,7 @@ import (
 func (c *Client) DownloadFile(fileName string) error {
 	fileHash := utils.FileToSha256(fileName)
 	fileName = filepath.Base(fileName)
-	fmt.Fprintln(c.conn, "DOWNLOAD", fileName, fileHash, c.user, utils.StringToSha256(c.password))
+	fmt.Fprintln(c.conn, "DOWNLOAD", fileName, fileHash, c.user, c.password)
 	return c.download(fileName)
 }
 

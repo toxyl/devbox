@@ -19,7 +19,7 @@ func main() {
 	glog.LoggerConfig.ShowSubsystem = false
 	glog.LoggerConfig.ShowDateTime = false
 	glog.LoggerConfig.ShowRuntimeMilliseconds = false
-	glog.LoggerConfig.ShowRuntimeSeconds = true
+	glog.LoggerConfig.ShowRuntimeSeconds = false
 
 	core.InitErrorRegistry()
 
@@ -280,68 +280,10 @@ func main() {
 	)
 
 	core.RegisterCommand(
-		command.REPO_INFO,
-		"Displays the currently used repo settings.\nNote that the admin password will only be displayed in its SHA256 form.",
+		command.REPO_CLIENT_INFO,
+		"Displays the currently used repo client settings.",
 		core.ArgInfoList{},
-		command.RepoInfo,
-	)
-
-	core.RegisterCommand(
-		command.REPO_SERVER_CONFIG,
-		"Configures the repo server.",
-		core.ArgInfoList{
-			{
-				Optional: false,
-				Variadic: false,
-				Type:     core.ARG_TYPE_COMMAND,
-				Name:     "address",
-				Example:  "127.0.0.1:438",
-			},
-			{
-				Optional: false,
-				Variadic: false,
-				Type:     core.ARG_TYPE_DIR,
-				Name:     "path",
-				Example:  "/tmp/my-repo/",
-			},
-		},
-		command.RepoServerConfig,
-	)
-
-	core.RegisterCommand(
-		command.REPO_SERVER_USER_ADD,
-		"Adds a user to the repo server.\nIf the third argument is 'true' the user will be created with admin privileges.",
-		core.ArgInfoList{
-			{
-				Optional: false,
-				Variadic: false,
-				Type:     core.ARG_TYPE_COMMAND,
-				Name:     "name",
-				Example:  "user",
-			},
-			{
-				Optional: false,
-				Variadic: false,
-				Type:     core.ARG_TYPE_COMMAND,
-				Name:     "password",
-				Example:  "password123",
-			},
-			{
-				Optional: true,
-				Variadic: false,
-				Type:     core.ARG_TYPE_BOOL,
-				Name:     "admin",
-				Example:  "true",
-			},
-		},
-		command.RepoServerUserAdd,
-	)
-
-	core.RegisterCommand(
-		command.REPO_SERVER,
-		"Starts the repo server.",
-		core.ArgInfoList{},
-		command.RepoServer,
+		command.RepoClientInfo,
 	)
 
 	core.RegisterCommand(
@@ -371,6 +313,71 @@ func main() {
 			},
 		},
 		command.RepoClientConfig,
+	)
+
+	core.RegisterCommand(
+		command.REPO_SERVER_INFO,
+		"Displays the currently used repo server settings.",
+		core.ArgInfoList{},
+		command.RepoServerInfo,
+	)
+
+	core.RegisterCommand(
+		command.REPO_SERVER_CONFIG,
+		"Configures the repo server.",
+		core.ArgInfoList{
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "address",
+				Example:  "127.0.0.1:438",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_DIR,
+				Name:     "path",
+				Example:  "/tmp/my-repo/",
+			},
+		},
+		command.RepoServerConfig,
+	)
+
+	core.RegisterCommand(
+		command.REPO_SERVER_USER,
+		"Adds a user to the repo server or updates an existing user.\nIf the third argument is 'true' the user will be created with admin privileges.",
+		core.ArgInfoList{
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "user",
+				Example:  "user",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "password",
+				Example:  "password123",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_BOOL,
+				Name:     "admin",
+				Example:  "true",
+			},
+		},
+		command.RepoServerUserAdd,
+	)
+
+	core.RegisterCommand(
+		command.REPO_SERVER,
+		"Starts the repo server.",
+		core.ArgInfoList{},
+		command.RepoServer,
 	)
 
 	core.RegisterCommand(

@@ -17,15 +17,16 @@ func (s *Server) handleDownload(conn net.Conn, scanner *bufio.Scanner) {
 	fileName, _ := ScanToken(scanner)
 	fileHash, _ := ScanToken(scanner)
 	user, _ := ScanToken(scanner)
-	passwordHash, _ := ScanToken(scanner)
+	password, _ := ScanToken(scanner)
 
-	if !s.isUser(user, passwordHash) {
+	if !s.isUser(user, password) {
 		fmt.Fprintln(conn, "ERROR Access denied!")
 		return
 	}
 
 	logServer.Info(
-		"%s wants to download %s (%s)",
+		"%s (%s) wants to download %s (%s)",
+		glog.Highlight(user),
 		glog.ConnRemote(conn, false),
 		glog.File(fileName),
 		glog.Highlight(fileHash),
@@ -42,7 +43,8 @@ func (s *Server) handleDownload(conn net.Conn, scanner *bufio.Scanner) {
 	if fileHashServer == fileHash {
 		// File is already up to date
 		logServer.OK(
-			"%s already has the latest version of %s",
+			"%s (%s) already has the latest version of %s",
+			glog.Highlight(user),
 			glog.ConnRemote(conn, false),
 			glog.File(filePath),
 		)
@@ -69,14 +71,16 @@ func (s *Server) handleDownload(conn net.Conn, scanner *bufio.Scanner) {
 	response, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
 		logServer.Error(
-			"Failed to receive ready response from %s",
+			"Failed to receive ready response from %s (%s)",
+			glog.Highlight(user),
 			glog.ConnRemote(conn, false),
 		)
 		return
 	}
 	if strings.TrimSpace(response) != "READY" {
 		logServer.Error(
-			"Unexpected response from %s: %s",
+			"Unexpected response from %s (%s): %s",
+			glog.Highlight(user),
 			glog.ConnRemote(conn, false),
 			glog.Highlight(response),
 		)
@@ -84,15 +88,17 @@ func (s *Server) handleDownload(conn net.Conn, scanner *bufio.Scanner) {
 	}
 
 	logServer.Info(
-		"Sending %s to %s",
+		"Sending %s to %s (%s)",
 		glog.File(filePath),
+		glog.Highlight(user),
 		glog.ConnRemote(conn, false),
 	)
 	n, err := io.Copy(conn, file)
 	if err != nil {
 		logServer.Error(
-			"Failed to copy %s to %s: %s",
+			"Failed to copy %s to %s (%s): %s",
 			glog.File(filePath),
+			glog.Highlight(user),
 			glog.ConnRemote(conn, false),
 			glog.Error(err),
 		)
@@ -101,9 +107,10 @@ func (s *Server) handleDownload(conn net.Conn, scanner *bufio.Scanner) {
 	}
 
 	logServer.Success(
-		"Sent %s (%s) to %s",
+		"Sent %s (%s) to %s (%s)",
 		glog.File(filePath),
 		glog.HumanReadableBytesIEC(n),
+		glog.Highlight(user),
 		glog.ConnRemote(conn, false),
 	)
 }
