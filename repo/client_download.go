@@ -12,6 +12,27 @@ import (
 	"github.com/toxyl/glog"
 )
 
+type ProgressWriter struct {
+	Total          int64
+	ReportInterval int64
+	Callback       func(total int64)
+	w              io.Writer
+}
+
+func (pw *ProgressWriter) Write(p []byte) (n int, err error) {
+	n, err = pw.w.Write(p)
+	pw.Total += int64(n)
+	if pw.Total%pw.ReportInterval == 0 && pw.Callback != nil {
+		pw.Callback(pw.Total)
+	}
+	return
+}
+
+func (pw *ProgressWriter) Wrap(w io.Writer) io.Writer {
+	pw.w = w
+	return pw
+}
+
 func (c *Client) DownloadFile(fileNameRemote, fileNameLocal, storagePath string) error {
 	fileNameBase := filepath.Base(fileNameLocal)
 	fileNameLocal = filepath.Join(storagePath, fileNameBase)
@@ -45,7 +66,21 @@ func (c *Client) download(filePath string) error {
 			glog.File(filePath),
 			glog.ConnRemote(c.conn, false),
 		)
-		n, err := io.Copy(file, c.conn)
+
+		c.progressWriter = &ProgressWriter{
+			Total:          0,
+			ReportInterval: 1024 * 1024, // report progress every 1 MB
+			Callback: func(total int64) {
+				logClient.Info(
+					"Downloading %s (%s) from %s...",
+					glog.File(filePath),
+					glog.HumanReadableBytesIEC(total),
+					glog.ConnRemote(c.conn, false),
+				)
+			},
+		}
+
+		n, err := io.Copy(c.progressWriter.Wrap(file), c.conn)
 		if err != nil {
 			return err
 		}

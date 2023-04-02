@@ -5,9 +5,10 @@ import (
 )
 
 type Client struct {
-	conn     net.Conn
-	user     string
-	password string
+	conn           net.Conn
+	user           string
+	password       string
+	progressWriter *ProgressWriter
 }
 
 func NewClient(user, password string) *Client {
