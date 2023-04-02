@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/toxyl/devbox/utils"
 	"github.com/toxyl/glog"
@@ -17,13 +18,15 @@ type ProgressWriter struct {
 	ReportInterval int64
 	Callback       func(total int64)
 	w              io.Writer
+	lastReportTime time.Time
 }
 
 func (pw *ProgressWriter) Write(p []byte) (n int, err error) {
 	n, err = pw.w.Write(p)
 	pw.Total += int64(n)
-	if pw.Total%pw.ReportInterval == 0 && pw.Callback != nil {
+	if int64(time.Since(pw.lastReportTime).Seconds()) > pw.ReportInterval && pw.Callback != nil {
 		pw.Callback(pw.Total)
+		pw.lastReportTime = time.Now()
 		if fw, ok := pw.w.(*os.File); ok {
 			if err := fw.Sync(); err != nil {
 				return n, err
@@ -74,7 +77,7 @@ func (c *Client) download(filePath string) error {
 
 		c.progressWriter = &ProgressWriter{
 			Total:          0,
-			ReportInterval: 1024 * 1024, // report progress every 1 MB
+			ReportInterval: 10, // report progress every 10s
 			Callback: func(total int64) {
 				logClient.Info(
 					"Downloading %s (%s) from %s...",
