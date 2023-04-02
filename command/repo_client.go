@@ -7,7 +7,6 @@ import (
 )
 
 func RepoDownload(arg ...string) error {
-	log.Info("Downloading %s to %s...", glog.File(arg[0]), glog.File(arg[1]))
 	client := repo.NewClient(core.AppConfig.Repo.Client.User, core.AppConfig.Repo.Client.Password)
 	err := client.Connect(core.AppConfig.Repo.Client.Address)
 	if err != nil {
