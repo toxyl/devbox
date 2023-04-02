@@ -16,8 +16,12 @@ const (
 	WORKSPACE_RESTORE   = "workspace-restore"
 	WORKSPACE_DESTROY   = "workspace-destroy"
 	WORKSPACE_DETACH    = "workspace-detach"
-	STORAGE_PATH_GET    = "storage-path-get"
-	STORAGE_PATH_SET    = "storage-path-set"
+	STORAGE_PATH        = "storage-path"
+	REPO_INFO           = "repo-info"
+	REPO_CONFIG         = "repo-config"
+	REPO_SERVER         = "repo-server"
+	REPO_DOWNLOAD       = "repo-download"
+	REPO_UPLOAD         = "repo-upload"
 	SELF                = "/proc/self/exe"
 )
 

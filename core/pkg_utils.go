@@ -19,6 +19,10 @@ func GetStorageDir() string {
 	return AppConfig.StoragePath
 }
 
+func GetRepoDir() string {
+	return AppConfig.RepoPath
+}
+
 func GetWorkspaceDir() string {
 	return filepath.Join(AppConfig.StoragePath, "workspace")
 }

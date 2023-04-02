@@ -6,6 +6,6 @@ import (
 )
 
 func RepoServer(arg ...string) error {
-	srv := repo.NewServer(core.AppConfig.AdminUser, core.AppConfig.AdminPassword)
-	return srv.ListenAndServe(arg[0], arg[1])
+	srv := repo.NewServer(core.AppConfig.RepoAdminUser, core.AppConfig.RepoAdminPassword)
+	return srv.ListenAndServe(core.AppConfig.RepoAddress, core.GetRepoDir())
 }

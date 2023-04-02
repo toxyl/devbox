@@ -83,6 +83,11 @@ func (c *Client) download(filePath string) error {
 }
 
 func (c *Client) UploadFile(fileNameSrc, fileNameDst string) error {
+	f, err := os.Open(fileNameSrc)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
 	fileHash := utils.FileToSha256(fileNameSrc)
 	fileNameSrc = filepath.Base(fileNameSrc)
 	fmt.Fprintln(c.conn, "UPLOAD", fileNameDst, fileHash, c.user, utils.StringToSha256(c.password))

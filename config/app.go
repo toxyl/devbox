@@ -10,9 +10,11 @@ import (
 )
 
 type AppConfig struct {
-	StoragePath   string `mapstructure:"storage_path" yaml:"storage_path"`
-	AdminUser     string `mapstructure:"admin_user" yaml:"admin_user"`
-	AdminPassword string `mapstructure:"admin_password" yaml:"admin_password"`
+	StoragePath       string `mapstructure:"storage_path" yaml:"storage_path"`
+	RepoAdminUser     string `mapstructure:"repo_admin_user" yaml:"repo_admin_user"`
+	RepoAdminPassword string `mapstructure:"repo_admin_password" yaml:"repo_admin_password"`
+	RepoAddress       string `mapstructure:"repo_address" yaml:"repo_address"`
+	RepoPath          string `mapstructure:"repo_path" yaml:"repo_path"`
 }
 
 func (c *AppConfig) Path() string {
@@ -24,7 +26,7 @@ func (c *AppConfig) Path() string {
 }
 
 func (c *AppConfig) TestCredentials(user, password string) bool {
-	return user == c.AdminUser && gutils.StringToSha256(c.AdminPassword) == password
+	return user == c.RepoAdminUser && gutils.StringToSha256(c.RepoAdminPassword) == password
 }
 
 func (c *AppConfig) Save() error {
@@ -49,16 +51,20 @@ func (c *AppConfig) Load() error {
 	}
 
 	c.StoragePath = conf.StoragePath
-	c.AdminUser = conf.AdminUser
-	c.AdminPassword = conf.AdminPassword
+	c.RepoAdminUser = conf.RepoAdminUser
+	c.RepoAdminPassword = conf.RepoAdminPassword
+	c.RepoAddress = conf.RepoAddress
+	c.RepoPath = conf.RepoPath
 	return nil
 }
 
 func NewAppConfig() *AppConfig {
 	ac := &AppConfig{
-		StoragePath:   os.TempDir(),
-		AdminUser:     "",
-		AdminPassword: "",
+		StoragePath:       os.TempDir(),
+		RepoAdminUser:     "admin",
+		RepoAdminPassword: "admin",
+		RepoAddress:       "127.0.0.1:438",
+		RepoPath:          filepath.Join(os.TempDir(), "repo"),
 	}
 	return ac
 }

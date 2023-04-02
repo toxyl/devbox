@@ -266,80 +266,73 @@ func main() {
 	)
 
 	core.RegisterCommand(
-		command.STORAGE_PATH_GET,
-		"Displays the currently used storage path for DevBoxes and workspaces.",
-		core.ArgInfoList{},
-		command.StoragePathGet,
-	)
-
-	core.RegisterCommand(
-		command.STORAGE_PATH_SET,
-		"Sets the storage path for DevBoxes and workspaces.\nDon't forget to run `exec bash` to refresh the Bash completions.",
+		command.STORAGE_PATH,
+		"Displays or sets the storage path for DevBoxes and workspaces.",
 		core.ArgInfoList{
 			{
-				Type:    core.ARG_TYPE_DIR,
-				Name:    "path",
-				Example: "/tmp/my-workspace/",
+				Optional: true,
+				Type:     core.ARG_TYPE_DIR,
+				Name:     "path",
+				Example:  "/tmp/my-workspace/",
 			},
 		},
-		command.StoragePathSet,
+		command.StoragePath,
 	)
 
 	core.RegisterCommand(
-		"repo-credentials",
-		"Set the credentials for admin access to the repo server.",
+		command.REPO_INFO,
+		"Displays the currently used repo settings.\nNote that the admin password will only be displayed in its SHA256 form.",
+		core.ArgInfoList{},
+		command.RepoInfo,
+	)
+
+	core.RegisterCommand(
+		command.REPO_CONFIG,
+		"Configures the repo server.",
 		core.ArgInfoList{
 			{
 				Optional: false,
 				Variadic: false,
 				Type:     core.ARG_TYPE_COMMAND,
-				Name:     "user",
+				Name:     "address",
+				Example:  "127.0.0.1:438",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_DIR,
+				Name:     "path",
+				Example:  "/tmp/my-repo/",
+			},
+			{
+				Optional: false,
+				Variadic: false,
+				Type:     core.ARG_TYPE_COMMAND,
+				Name:     "admin user",
 				Example:  "admin",
 			},
 			{
 				Optional: false,
 				Variadic: false,
 				Type:     core.ARG_TYPE_COMMAND,
-				Name:     "password",
+				Name:     "admin password",
 				Example:  "password12345",
 			},
 		},
-		command.RepoCredentialsSet,
+		command.RepoConfig,
 	)
 
 	core.RegisterCommand(
-		"repo-server",
+		command.REPO_SERVER,
 		"Starts the repo server.",
-		core.ArgInfoList{
-			{
-				Optional: false,
-				Variadic: false,
-				Type:     core.ARG_TYPE_COMMAND,
-				Name:     "address",
-				Example:  "127.0.0.1:80",
-			},
-			{
-				Optional: false,
-				Variadic: false,
-				Type:     core.ARG_TYPE_COMMAND,
-				Name:     "base path",
-				Example:  "/tmp",
-			},
-		},
+		core.ArgInfoList{},
 		command.RepoServer,
 	)
 
 	core.RegisterCommand(
-		"repo-download",
+		command.REPO_DOWNLOAD,
 		"Downloads a file from the repo server.",
 		core.ArgInfoList{
-			{
-				Optional: false,
-				Variadic: false,
-				Type:     core.ARG_TYPE_COMMAND,
-				Name:     "address",
-				Example:  "127.0.0.1:80",
-			},
 			{
 				Optional: false,
 				Variadic: false,
@@ -352,16 +345,9 @@ func main() {
 	)
 
 	core.RegisterCommand(
-		"repo-upload",
-		"Uploads a file to the repo server.\nRequires credentials to be set via repo-credentials.",
+		command.REPO_UPLOAD,
+		"Uploads a file to the repo server.\nRequires credentials to be set via repo-admin.",
 		core.ArgInfoList{
-			{
-				Optional: false,
-				Variadic: false,
-				Type:     core.ARG_TYPE_COMMAND,
-				Name:     "address",
-				Example:  "127.0.0.1:80",
-			},
 			{
 				Optional: false,
 				Variadic: false,

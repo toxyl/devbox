@@ -12,7 +12,12 @@ import (
 	"github.com/toxyl/glog"
 )
 
-func StoragePathSet(arg ...string) error {
+func StoragePath(arg ...string) error {
+	if len(arg) == 0 {
+		log.OK("Current storage directory: %s", glog.File(core.GetStorageDir()))
+		return nil
+	}
+
 	path := arg[0]
 	path, err := filepath.Abs(path)
 	if err != nil {
